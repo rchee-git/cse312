@@ -1,1 +1,7 @@
-# cse312
+# 312
+
+# install dependencies(need to do first!)
+npm install
+
+# start project
+npm start
