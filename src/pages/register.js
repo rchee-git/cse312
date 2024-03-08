@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "../css/register.css";
 
 function Register() {
-  const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -11,7 +10,6 @@ function Register() {
     e.preventDefault();
 
     const formData = {
-      fullName,
       username,
       password,
       confirmPassword,
@@ -42,17 +40,7 @@ function Register() {
     <div className="registration-form-container">
       <form id="registrationForm" onSubmit={handleSubmit}>
         <h2>Register</h2>
-        <div className="form-group">
-          <label htmlFor="fullName">Full Name</label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
-        </div>
+
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input
