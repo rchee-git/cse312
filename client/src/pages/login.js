@@ -1,15 +1,15 @@
-// Import React, useState, axios, and the useNavigate hook
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "../css/login.css";
+
+const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Create an instance of useNavigate
+  const navigate = useNavigate(); 
 
-  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
   const handleLogin = async (event) => {
     event.preventDefault();
