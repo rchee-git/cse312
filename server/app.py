@@ -7,9 +7,6 @@ database = mongo["Recall"]
 users = database["users"]
 
 app = Flask(__name__)
-    
-
-@app.route("/Register", methods=['POST'])
 
 def check_pass(password,confirm):
     special_characters = "!@#$%^&()_-="
@@ -34,12 +31,22 @@ def check_pass(password,confirm):
             return False
     return (uppercase and lowercase and special and number)
 
+
+@app.route('/')
+def home_page():
+    return render_template('home.js')
+
+@app.route("/register", methods=['POST',"GET"])
 def register():
+    if request.method == 'GET':
+        return render_template('Register.js')
     data = request.get_json
     username = data.get('username')
     password = data.get('password')
     confirm = data.get('confirmPassword')
-
+    print(username)
+    print(confirm)
+    print(password)
     validate = check_pass(password, confirm)
     if not validate:
         return make_response('Error: Not Valid', 400)
@@ -47,11 +54,11 @@ def register():
     search = users.find_one({'username': username})
     if search == None:
         salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.enccode('utf-8'), salt)
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
         user = {"username":username, "hash":hashed, "salt":salt}
         users.insert_one(user)
         return make_response("Registered",200)
     else:
         return make_response('Error: Not Valid', 400)
     
-app.run(host="localhost",port=8080)
+app.run(host="localhost",port=3000)
