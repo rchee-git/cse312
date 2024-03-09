@@ -60,5 +60,8 @@ def register():
         return make_response("Registered",200)
     else:
         return make_response('Error: Not Valid', 400)
+
+@app.route("/login", methods=["POST", "GET"])
+
     
 app.run(host="localhost",port=3000)
