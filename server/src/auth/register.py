@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from bson.json_util import dumps
 import bcrypt
 
+from src.service.db import users_collection
+
 register_api = Blueprint("register_api", __name__)
 
 

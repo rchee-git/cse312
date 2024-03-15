@@ -1,1 +1,8 @@
-venv/*
+env/*
+__pycache__/*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
