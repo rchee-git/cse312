@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./Register.css";
 
+const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -13,17 +15,15 @@ function Register() {
       alert("The passwords do not match. Please try again.");
       throw new Error("Passwords do not match.");
     }
-
-    const formData = {
-      username,
-      password,
-      confirmPassword,
-    };
-
+    
     try {
       const response = await axios.post(
-        "http://localhost:3000/register",
-        JSON.stringify(formData),
+        `${apiUrl}/auth/register`,
+        {
+          username,
+          password,
+          confirmPassword,
+        },
         {
           headers: {
             "Content-Type": "application/json",
