@@ -1,64 +1,15 @@
-from flask import Flask, request, jsonify, redirect, render_template, make_response
-import bcrypt
-from pymongo import MongoClient
-
-mongo = MongoClient("mongo")
-database = mongo["Recall"]
-users = database["users"]
+from flask import Flask
+from flask_pymongo import PyMongo
+from src.auth.register import register_api
 
 app = Flask(__name__)
 
-def check_pass(password,confirm):
-    special_characters = "!@#$%^&()_-="
-    if password != confirm:
-        return False
-    if len(password) < 8:
-        return False
-    uppercase = False
-    lowercase = False
-    special = False
-    number = False
-    for character in password:
-        if character.isupper():
-            uppercase = True
-        if character.islower():
-            lowercase = True
-        if character.isdigit():
-            number = True
-        if character in special_characters:
-            special = True
-        if not character.isalnum():
-            return False
-    return (uppercase and lowercase and special and number)
+# Setup MongoDB connection
+app.config["MONGO_URI"] = "mongodb://localhost:27017/yourDatabaseName"
+mongo = PyMongo(app)
 
+# Register the blueprints
+app.register_blueprint(register_api)
 
-@app.route('/')
-def home_page():
-    return render_template('home.js')
-
-@app.route("/register", methods=['POST',"GET"])
-def register():
-    if request.method == 'GET':
-        return render_template('Register.js')
-    data = request.get_json
-    username = data.get('username')
-    password = data.get('password')
-    confirm = data.get('confirmPassword')
-    print(username)
-    print(confirm)
-    print(password)
-    validate = check_pass(password, confirm)
-    if not validate:
-        return make_response('Error: Not Valid', 400)
-
-    search = users.find_one({'username': username})
-    if search == None:
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-        user = {"username":username, "hash":hashed, "salt":salt}
-        users.insert_one(user)
-        return make_response("Registered",200)
-    else:
-        return make_response('Error: Not Valid', 400)
-    
-app.run(host="localhost",port=3000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
