@@ -6,16 +6,7 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <Link to="/login">
-        <button class="button" id="login">
-          Log In
-        </button>
-      </Link>
-      <Link to="/register">
-        <button class="button" id="regisster">
-          Register
-        </button>{" "}
-      </Link>
+      <h1>Private page</h1>
     </div>
   );
 }

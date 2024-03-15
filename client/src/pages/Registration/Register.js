@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./Register.css";
 
 function Register() {
@@ -8,6 +9,10 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("The passwords do not match. Please try again.");
+      throw new Error("Passwords do not match.");
+    }
 
     const formData = {
       username,
@@ -16,17 +21,18 @@ function Register() {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.post(
+        "http://localhost:3000/register",
+        JSON.stringify(formData),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Success:", result);
+      if (response.status === 200) {
+        console.log("Success:", response.data);
         // Handle success - for example, redirect to login page or clear the form
       } else {
         console.error("Error:", response.statusText);

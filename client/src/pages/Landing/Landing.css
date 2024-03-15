@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, blue, orange);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+}
+
+.button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    background-color: black; /* Button background color */
+    color: white; /* Button text color */
+    transition: opacity 0.3s;
+}
+
+.button:hover {
+    opacity: 0.8; /* Button hover effect to change opacity */
+}
