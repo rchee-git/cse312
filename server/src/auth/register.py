@@ -6,6 +6,28 @@ from src.service.db import users_collection
 
 register_api = Blueprint("register_api", __name__)
 
+def check_pass(password,confirm):
+    special_characters = "!@#$%^&()_-="
+    if password != confirm:
+        return False
+    if len(password) < 8:
+        return False
+    uppercase = False
+    lowercase = False
+    special = False
+    number = False
+    for character in password:
+        if character.isupper():
+            uppercase = True
+        if character.islower():
+            lowercase = True
+        if character.isdigit():
+            number = True
+        if character in special_characters:
+            special = True
+        if not character.isalnum():
+            return False
+    return (uppercase and lowercase and special and number)
 
 @register_api.route("/auth/register", methods=["POST"])
 def register():
