@@ -24,10 +24,13 @@ def register():
 
     # Adds cookie to response
     if True: # login not done, but this should make sure login is valid (username/password good)
-        auth_token = str(uuid.uuid4())  
-        users_collection.update_one()
+        new_auth_token = str(uuid.uuid4())  
+        users_collection.update_one(
+            {"username": username},  
+            {"$set": {"auth_token": new_auth_token}} 
+        )
         response = jsonify({"message": "Logged in successfully."}), 200
-        response.set_cookie('auth_token', auth_token, httponly=True)
+        response.set_cookie('auth_token', new_auth_token, httponly=True)
         return response
     else:
         response = jsonify({"message": "ERROR"}), 404
@@ -54,3 +57,11 @@ def register():
         dumps({"message": "User registered successfully", "user_id": str(user_id)}),
         201,
     )
+
+@login_api.route("/auth/logout", methods=["POST"])
+def logout():
+    auth_token = request.cookies.get('auth_token')
+    users_collection.find_one({"auth_token": auth_token})
+    response = jsonify({"message": "Logged out successfully."}), 200
+    response.set_cookie('auth_token', '', expires=0)
+    return response
