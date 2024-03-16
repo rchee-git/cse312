@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from bson.json_util import dumps
 import bcrypt
+import uuid
 
 from src.service.db import users_collection
 
@@ -20,6 +21,17 @@ def register():
     # Check if username already exists
     # if users.find_one({"username": username}):
     #    return jsonify({"error": "Username already exists"}), 400
+
+    # Adds cookie to response
+    if True: # login not done, but this should make sure login is valid (username/password good)
+        auth_token = str(uuid.uuid4())  
+        users_collection.update_one()
+        response = jsonify({"message": "Logged in successfully."}), 200
+        response.set_cookie('auth_token', auth_token, httponly=True)
+        return response
+    else:
+        response = jsonify({"message": "ERROR"}), 404
+        return response
 
     return (
         dumps({"message": "User registered successfully", "user_id": str(user_id)}),

@@ -8,12 +8,11 @@ const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); 
-
+  const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    console.log("logging in...")
+    console.log("logging in...");
     try {
       // Using Axios for the POST request
       const response = await axios.post(`${apiUrl}/auth/login`, {
