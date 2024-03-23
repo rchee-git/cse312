@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from bson.json_util import dumps
 import bcrypt
 
 from src.service.db import users_collection
@@ -36,31 +35,20 @@ def register():
     confirmPassword = request.json["confirmPassword"]
 
     # Check if the passwords match
-    if password != confirmPassword:
-        return jsonify({"error": "Passwords do not match"}), 400
 
-    # Check if username already exists
-    # if users.find_one({"username": username}):
-    #    return jsonify({"error": "Username already exists"}), 400
+    validate = check_pass(password, confirmPassword)
+    if validate:
+        if users_collection.find_one({"username" :username}):
+            response = jsonify({"message": "User already Exists"}), 404
+            return response
+        else:
+                # Generate salted hash for password
+            salt = bcrypt.gensalt()
+            hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
 
-    return (
-        dumps({"message": "User registered successfully", "user_id": str(user_id)}),
-        201,
-    )
-
-    # Generate salted hash for password
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
-
-    # Insert new user into the database
-    user_id = users.insert_one(
-        {
-            "username": username,
-            "password": hashed_password,
-        }
-    ).inserted_id
-
-    return (
-        dumps({"message": "User registered successfully", "user_id": str(user_id)}),
-        201,
-    )
+                # Insert new user into the database
+            user_id = users_collection.insert_one({"username": username,"password": hashed_password})
+            response = jsonify({"message": "User Registered"}), 201
+            return response
+    else:
+        response = jsonify({"message": "Passwords Do Not Match"}), 404
