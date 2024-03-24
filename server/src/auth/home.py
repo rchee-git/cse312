@@ -5,7 +5,7 @@ posts_api = Blueprint("posts_api", __name__)
 
 @posts_api.route("/api/posts", methods=["POST"])
 def create_post():
-    post_content = request.json["content"]
+    post_content = request.json.get("content")
     username = request.json.get("username")
 
     if not post_content:
@@ -26,7 +26,7 @@ def create_post():
     return jsonify({
         "message": "Post created successfully",
         "post_id": str(post_id),
-        "username": username  # Return the username along with the response
+        "username": username
     }), 201
 
 @posts_api.route("/api/posts", methods=["GET"])
