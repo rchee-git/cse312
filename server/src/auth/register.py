@@ -52,3 +52,5 @@ def register():
             return response
     else:
         response = jsonify({"message": "Passwords Do Not Match"}), 404
+        return response
+    
