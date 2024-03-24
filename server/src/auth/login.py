@@ -9,59 +9,36 @@ login_api = Blueprint("login_api", __name__)
 
 
 @login_api.route("/auth/login", methods=["POST"])
-def register():
-    username = request.json["username"]
-    password = request.json["password"]
-    confirmPassword = request.json["confirmPassword"]
+def login():
+    username = request.json.get("username")
+    password = request.json.get("password")
 
-    # Check if the passwords match
-    if password != confirmPassword:
-        return jsonify({"error": "Passwords do not match"}), 400
+    # Check if user exists
+    user = users_collection.find_one({"username": username})
+    if not user:
+        return jsonify({"error": "Invalid username or password"}), 401
 
-    # Check if username already exists
-    # if users.find_one({"username": username}):
-    #    return jsonify({"error": "Username already exists"}), 400
+    # Verify password (assuming the stored password is hashed)
+    if bcrypt.checkpw(password.encode("utf-8"), user["password"].encode("utf-8")):
+        new_auth_token = str(uuid.uuid4())
 
-    # Adds cookie to response
-    if True: # login not done, but this should make sure login is valid (username/password good)
-        new_auth_token = str(uuid.uuid4())  
+        # Update the user's auth token in the database
         users_collection.update_one(
-            {"username": username},  
-            {"$set": {"auth_token": new_auth_token}} 
+            {"username": username}, {"$set": {"auth_token": new_auth_token}}
         )
-        response = jsonify({"message": "Logged in successfully."}), 200
-        response.set_cookie('auth_token', new_auth_token, httponly=True)
-        return response
+
+        # Create a response and set the cookie
+        response = jsonify({"message": "Logged in successfully"})
+        response.set_cookie("auth_token", new_auth_token, httponly=True)
+        return response, 200
     else:
-        response = jsonify({"message": "ERROR"}), 404
-        return response
+        return jsonify({"error": "Invalid username or password"}), 401
 
-    return (
-        dumps({"message": "User registered successfully", "user_id": str(user_id)}),
-        201,
-    )
-
-    # Generate salted hash for password
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
-
-    # Insert new user into the database
-    user_id = users.insert_one(
-        {
-            "username": username,
-            "password": hashed_password,
-        }
-    ).inserted_id
-
-    return (
-        dumps({"message": "User registered successfully", "user_id": str(user_id)}),
-        201,
-    )
 
 @login_api.route("/auth/logout", methods=["POST"])
 def logout():
-    auth_token = request.cookies.get('auth_token')
+    auth_token = request.cookies.get("auth_token")
     users_collection.find_one({"auth_token": auth_token})
     response = jsonify({"message": "Logged out successfully."}), 200
-    response.set_cookie('auth_token', '', expires=0)
+    response.set_cookie("auth_token", "", expires=0)
     return response
