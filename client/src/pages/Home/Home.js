@@ -1,41 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "./Home.css";
 
 function Home() {
   const [postContent, setPostContent] = useState("");
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState([]); // Holds the list of posts
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      try {
-        const response = await axios.get("/posts");
-        setPosts(response.data);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    }
-
-    fetchPosts();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
-      const response = await axios.post("/posts", { content: postContent });
-      console.log(response.data); // Log success message
-      setPostContent(""); // Clear input field
+      // Add the new post to the beginning of the posts array immediately
+      setPosts([{ username: "guest", content: postContent }, ...posts]);
 
-      // Fetch updated posts after submission
-      const updatedPosts = await axios.get("/posts");
-      setPosts(updatedPosts.data);
+      // Clear the input after submission
+      setPostContent("");
 
-      // Reset submitting state
-      setSubmitting(false);
+      // Emulate delay before resetting submitting state
+      setTimeout(() => {
+        setSubmitting(false);
+      }, 1000); // Adjust as needed
     } catch (error) {
       console.error("Error creating post:", error);
       setSubmitting(false);
@@ -45,10 +32,10 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <button className="button" id="logout">
+      <button class="button" id="login">
         Logout
       </button>
-      <h1>Public Page</h1>
+      <h1>Private Page</h1>
       <div className="post-form">
         <form onSubmit={handleSubmit}>
           <textarea
@@ -65,7 +52,11 @@ function Home() {
       <div className="post-list">
         {posts.map((post, index) => (
           <div key={index} className="post">
-            <p>{post.content}</p>
+            <p>
+              {post.username}: {post.content}
+            </p>{" "}
+            {/* Display username along with the content */}
+            {/* Display other post details here if necessary */}
           </div>
         ))}
       </div>
