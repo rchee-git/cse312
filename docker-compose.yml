@@ -2,28 +2,31 @@ version: '3.8'
 
 services:
   client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+    build: ./client
     ports:
-      - "8080:80" # This will map port 80 in the container to port 8080 on your host machine
+      - "8080:80"
+    depends_on:
+      - server
+    networks:
+      - fullstack
 
   server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    build: ./server
     ports:
-      - "3000:8080" # If the Flask app runs on port 8080 inside the container
+      - "9000:9000"
     environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
+      - MONGO_URI=mongodb://mongo:27017
+    depends_on:
+      - mongo
+    networks:
+      - fullstack
 
   mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    networks:
+      - fullstack
 
-volumes:
-  mongo-data:
+networks:
+  fullstack:

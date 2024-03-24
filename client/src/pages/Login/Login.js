@@ -3,8 +3,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:8080";
-
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +13,7 @@ function Login() {
     console.log("logging in...");
     try {
       // Using Axios for the POST request
-      const response = await axios.post(`${apiUrl}/auth/login`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
         username,
         password,
       });
