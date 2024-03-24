@@ -7,7 +7,8 @@
 
 ### Backend installation (second terminal)
 - Open another terminal and ```cd server```
-- ```python3 -m venv env```
-- ```source env/bin/activate```
-- ```pip3 install -r requirements.txt```
-- To start: ```python3 app.py```
+- ```docker compose up --build```
+
+### Test examples
+- username: ```test1```
+- password: ```QJLFKX1232!W123q```

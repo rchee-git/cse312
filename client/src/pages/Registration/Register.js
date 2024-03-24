@@ -14,17 +14,13 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("The passwords do not match. Please try again.");
-      throw new Error("Passwords do not match.");
-    }
-    
     try {
       const response = await axios.post(
         `${apiUrl}/auth/register`,
         {
           username,
           password,
+          confirmPassword
         },
         {
           headers: {
