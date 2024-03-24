@@ -29,7 +29,8 @@ function Register() {
 
       if (response.status === 201) {
         console.log("Success:", response.data);
-        navigate("/home"); // Redirect to the home page
+        alert("Registration successful");
+        navigate("/");
       } else {
         console.error("Error:", response.statusText);
       }
