@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80" # This will map port 80 in the container to port 8080 on your host machine
+    environment:
+      - NODE_ENV=production
