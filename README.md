@@ -4,7 +4,7 @@
 ### installation instructions
 - ```docker compose up --build```
 - Note: 
-    - frontend is accessible through ```localhost:8080```
+    - frontend is accessible through ```localhost:8080``` (requirement)
     - backend is accessible through ```localhost:9000```
     - MongoDB is accessible through ```localhost:27017```
 
