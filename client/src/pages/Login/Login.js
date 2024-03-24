@@ -13,10 +13,14 @@ function Login() {
     console.log("logging in...");
     try {
       // Using Axios for the POST request
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/login`,
+        {
+          username,
+          password,
+        },
+        { withCredentials: true }
+      );
 
       // On successful login
       console.log("Login successful", response.data);

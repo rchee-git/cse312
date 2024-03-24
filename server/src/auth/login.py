@@ -1,6 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 import bcrypt
 import uuid
+from hashlib import sha256
+from datetime import datetime, timedelta
 
 from src.service.db import users_collection
 
@@ -21,15 +23,22 @@ def login():
     # No need to encode it again here
     if bcrypt.checkpw(password.encode("utf-8"), user["password"]):
         new_auth_token = str(uuid.uuid4())
+        hashed_token = sha256(new_auth_token.encode()).hexdigest()
 
-        # Update the user's auth token in the database
+        # Update the user's auth token in the database with the hashed version
         users_collection.update_one(
-            {"username": username}, {"$set": {"auth_token": new_auth_token}}
+            {"username": username}, {"$set": {"auth_token": hashed_token}}
         )
 
         # Create a response and set the cookie
-        response = jsonify({"message": "Logged in successfully"})
-        response.set_cookie("auth_token", new_auth_token, httponly=True)
+        response = make_response(jsonify({"message": "Logged in successfully"}))
+        # Set cookie to expire in 1 hour
+        response.set_cookie(
+            "auth_token",
+            new_auth_token,
+            httponly=True,
+            expires=datetime.now() + timedelta(hours=1),
+        )
         return response, 200
     else:
         return jsonify({"error": "Invalid username or password"}), 401
@@ -38,7 +47,12 @@ def login():
 @login_api.route("/auth/logout", methods=["POST"])
 def logout():
     auth_token = request.cookies.get("auth_token")
-    users_collection.find_one({"auth_token": auth_token})
-    response = jsonify({"message": "Logged out successfully."}), 200
+    if auth_token:
+        hashed_token = sha256(auth_token.encode()).hexdigest()
+        # Remove the hashed auth token from the database
+        users_collection.update_one(
+            {"auth_token": hashed_token}, {"$unset": {"auth_token": ""}}
+        )
+    response = make_response(jsonify({"message": "Logged out successfully."}))
     response.set_cookie("auth_token", "", expires=0)
     return response
