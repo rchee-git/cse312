@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 from src.auth.register import register_api
 from src.auth.login import login_api
+from src.feed.home import posts_api
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)

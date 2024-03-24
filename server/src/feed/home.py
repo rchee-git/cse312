@@ -3,7 +3,7 @@ from src.service.db import posts_collection, users_collection
 
 posts_api = Blueprint("posts_api", __name__)
 
-@posts_api.route("/api/posts", methods=["POST"])
+@posts_api.route("/feed/home", methods=["POST"])
 def create_post():
     post_content = request.json.get("content")
     username = request.json.get("username")
@@ -29,7 +29,7 @@ def create_post():
         "username": username
     }), 201
 
-@posts_api.route("/api/posts", methods=["GET"])
+@posts_api.route("/feed/home", methods=["GET"])
 def get_posts():
     posts = posts_collection.find()
 
