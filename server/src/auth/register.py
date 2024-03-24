@@ -14,7 +14,7 @@ def register():
 
     # Check if username already exists
     if users_collection.find_one({"username": username}):
-       return jsonify({"error": "Username already exists"}), 400
+        return jsonify({"error": "Username already exists"}), 400
 
     # Generate salted hash for password
     salt = bcrypt.gensalt()
@@ -29,6 +29,6 @@ def register():
     ).inserted_id
 
     return (
-        dumps({"message": "User registered successfully", "user_id": str(user_id)}),
+        jsonify({"message": "User registered successfully", "user_id": str(user_id)}),
         201,
     )

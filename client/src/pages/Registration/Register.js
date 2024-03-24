@@ -1,13 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Register.css";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
 function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +25,6 @@ function Register() {
         {
           username,
           password,
-          confirmPassword,
         },
         {
           headers: {
@@ -31,9 +33,9 @@ function Register() {
         }
       );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log("Success:", response.data);
-        // Handle success - for example, redirect to login page or clear the form
+        navigate("/home"); // Redirect to the home page
       } else {
         console.error("Error:", response.statusText);
       }

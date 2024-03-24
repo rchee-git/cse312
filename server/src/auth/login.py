@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from bson.json_util import dumps
 import bcrypt
 import uuid
 
@@ -18,8 +17,9 @@ def login():
     if not user:
         return jsonify({"error": "Invalid username or password"}), 401
 
-    # Verify password (assuming the stored password is hashed)
-    if bcrypt.checkpw(password.encode("utf-8"), user["password"].encode("utf-8")):
+    # Assuming user["password"] is stored as bytes in the database
+    # No need to encode it again here
+    if bcrypt.checkpw(password.encode("utf-8"), user["password"]):
         new_auth_token = str(uuid.uuid4())
 
         # Update the user's auth token in the database
