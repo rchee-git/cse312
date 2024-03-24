@@ -4,7 +4,7 @@ services:
   web:
     build: .
     ports:
-      - "8080:8080"
+      - "9000:9000"
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
@@ -12,7 +12,7 @@ services:
       - .:/app
     depends_on:
       - mongo
-    command: flask run --host=0.0.0.0 --port=8080
+    command: flask run --host=0.0.0.0 --port=9000
 
   mongo:
     image: mongo:latest

@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Register.css";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:8080";
-
 function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +14,7 @@ function Register() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${apiUrl}/auth/register`,
+        `${process.env.REACT_APP_API_URL}/auth/register`,
         {
           username,
           password,
