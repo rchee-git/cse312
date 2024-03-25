@@ -40,6 +40,20 @@ function Home() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    const x = async () => {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/feed/like`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response.data);
+    };
+    x();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
