@@ -15,6 +15,19 @@ function Home() {
     fetchPosts();
   }, []);
 
+  const handleLogout = async (e) => {
+    e.preventDefalt();
+
+    try{
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/logout`
+      );
+    }
+    catch (error) {
+      console.error("Failed to post:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -39,6 +52,10 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
+      <button onClick={handleLogout} class = 'button' id = 'logout'>
+        Logout
+      </button>
+      
       <div className="post-form">
         <form onSubmit={handleSubmit}>
           <textarea
