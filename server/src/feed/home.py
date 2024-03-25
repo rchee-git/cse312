@@ -26,7 +26,8 @@ def create_post():
     return jsonify({
         "message": "Post created successfully",
         "post_id": str(post_id),
-        "username": username
+        "username": username,
+        "content": post_content
     }), 201
 
 @posts_api.route("/feed/home", methods=["GET"])
