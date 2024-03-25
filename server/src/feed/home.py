@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from src.service.db import posts_collection, users_collection
 from hashlib import sha256
+from bson import ObjectId
 
 posts_api = Blueprint("posts_api", __name__)
 
@@ -40,7 +41,9 @@ def get_posts():
     for post in posts:
         posts_list.append({
             "content": post["content"],
-            "username": post.get("username")
+            "username": post.get("username"),
+            "_id": str(post['_id']),
+            "post_like_list": post["post_like_list"]
         })
 
     return jsonify(posts_list), 200
@@ -49,8 +52,8 @@ def get_posts():
 def like_post():
 
     # get post id from request
-    post_id = ''
-    
+    post_id = request.json.get("post_id")
+
     # get username
     auth_token = request.cookies.get("auth_token")
     hashed_token = sha256(auth_token.encode()).hexdigest()
@@ -58,14 +61,16 @@ def like_post():
     username = user['username']
 
     # find post in database using post_id
-    post_data = posts_collection.find_one({"_id": post_id})
+    post_data = posts_collection.find_one({"_id": ObjectId(post_id)})
     post_like_list = post_data['post_like_list']
 
-    # add username to post_like_list(list of usernames)
-    post_like_list.append(username)
-
+    if username in post_like_list:
+        post_like_list.remove(username)
+    else:
+        # add username to post_like_list(list of usernames)
+        post_like_list.append(username)
     # update database with new post_like_list
     posts_collection.update_one(
-        {"auth_token": hashed_token}, {"$set": {"post_like_list": post_like_list}}
-    )
-    return 'good'
+        {"_id": ObjectId(post_id)}, {"$set": {"post_like_list": post_like_list}}
+        )
+    return 'good' + str(post_like_list)

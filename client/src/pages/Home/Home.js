@@ -9,15 +9,15 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/feed/home`
-      );
-      setPosts(response.data);
-    };
-
     fetchPosts();
   }, []);
+
+  const fetchPosts = async () => {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/feed/home`
+    );
+    setPosts(response.data);
+  };
 
   const handleLogout = async (e) => {
     e.preventDefalt();
@@ -30,20 +30,6 @@ function Home() {
       console.error("Failed to post:", error);
     }
   };
-
-  useEffect(() => {
-    const x = async () => {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/feed/like`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-      console.log(response.data);
-    };
-    x();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,17 +60,17 @@ function Home() {
 
   // like button
 
-  const handleLike = async (index) => {
+  const handleLike = async (post, index) => {
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/feed/like`,
-        {},
+        {
+          post_id: post._id,
+        },
         { withCredentials: true }
       );
-
-      const updatedPosts = [...posts];
-      updatedPosts[index] = { ...updatedPosts[index], ...response.data };
-      setPosts(updatedPosts);
+      fetchPosts();
+      console.log(response);
     } catch (error) {
       console.error("Failed to like post:", error);
     }
@@ -117,10 +103,10 @@ function Home() {
               {post.username}: {post.content}
             </p>
             <button
-              onClick={() => handleLike(post._id, index)}
+              onClick={() => handleLike(post, index)}
               disabled={post.isLiked}
             >
-              Like ({post.likes || 0})
+              Like ({post.post_like_list.length || 0})
             </button>
           </div>
         ))}
