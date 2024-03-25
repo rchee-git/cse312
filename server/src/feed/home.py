@@ -1,20 +1,21 @@
 from flask import Blueprint, request, jsonify
 from src.service.db import posts_collection, users_collection
+from hashlib import sha256
 
 posts_api = Blueprint("posts_api", __name__)
 
 @posts_api.route("/feed/home", methods=["POST"])
 def create_post():
     post_content = request.json.get("content")
-    username = request.json.get("username")
 
+    auth_token = request.cookies.get("auth_token")
+    hashed_token = sha256(auth_token.encode()).hexdigest()
+    user = users_collection.find_one({"auth_token": hashed_token})
+    username = user['username']
+    
     if not post_content:
         return jsonify({"error": "Post content is required"}), 400
 
-    if username:
-        user = users_collection.find_one({"username": username})
-        if not user:
-            return jsonify({"error": "Invalid user"}), 401
 
     post_id = posts_collection.insert_one(
         {
