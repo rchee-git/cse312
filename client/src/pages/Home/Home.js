@@ -19,41 +19,20 @@ function Home() {
     fetchPosts();
   }, []);
 
-<<<<<<< HEAD
   const handleLogout = async (e) => {
-    e.preventDefalt();
+    e.preventDefault();
 
     try{
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/logout`
       );
+      console.log("Logout Successful",response.data);
+      navigate("/login");
     }
     catch (error) {
-      console.error("Failed to post:", error);
+      console.error("Failed to logout:", error);
     }
   };
-=======
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/auth/checkAuth`,
-          {},
-          {
-            withCredentials: true,
-          }
-        );
-
-        if (response.data == "bad") {
-          navigate("/");
-        }
-      } catch (error) {
-        console.log("Error: ", error);
-      }
-    };
-    checkAuth();
-  }, []);
->>>>>>> 14911a050e30192b96524a2f2554afa7b315e66e
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,7 +64,7 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <button onClick={handleLogout} class = 'button' id = 'logout'>
+      <button onClick={handleLogout} className = 'button' id = 'logout'>
         Logout
       </button>
       

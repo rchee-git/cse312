@@ -46,6 +46,7 @@ def login():
 
 @login_api.route("/auth/logout", methods=["POST"])
 def logout():
+
     auth_token = request.cookies.get("auth_token")
     if auth_token:
         hashed_token = sha256(auth_token.encode()).hexdigest()
@@ -54,7 +55,7 @@ def logout():
             {"auth_token": hashed_token}, {"$unset": {"auth_token": ""}}
         )
     response = make_response(jsonify({"message": "Logged out successfully."}))
-    response.set_cookie("auth_token", "", expires=0)
+    response.set_cookie("auth_token", "",path = '/', max_age=0)
     return response
 
 
