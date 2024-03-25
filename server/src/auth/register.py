@@ -32,6 +32,7 @@ def register():
         {
             "username": username,
             "password": hashed_password,
+            "auth_token": "",
         }
     ).inserted_id
 

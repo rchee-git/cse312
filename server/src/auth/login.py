@@ -56,3 +56,19 @@ def logout():
     response = make_response(jsonify({"message": "Logged out successfully."}))
     response.set_cookie("auth_token", "", expires=0)
     return response
+
+
+@login_api.route("/auth/checkAuth", methods=["POST"])
+def checkAuth():
+    auth_token = request.cookies.get("auth_token")
+    if not auth_token:
+        return "bad"
+    hashed_token = sha256(auth_token.encode()).hexdigest()
+    user = users_collection.find_one({"auth_token": hashed_token})
+    
+    response = ""
+    if user:
+         response = "good"
+    else:
+        response = "bad"
+    return response

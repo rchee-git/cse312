@@ -24,4 +24,4 @@
 
 ### Test examples
 - username: ```test1```
-- password: ```QJLFKX1232!W123q```
+- password: ```QJLFKX12323W123q```
