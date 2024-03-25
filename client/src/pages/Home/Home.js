@@ -18,14 +18,15 @@ function Home() {
 
       // Clear the input after submission
       setPostContent("");
-
-      // Emulate delay before resetting submitting state
-      setTimeout(() => {
-        setSubmitting(false);
-      }, 1000); // Adjust as needed
-    } catch (error) {
-      console.error("Error creating post:", error);
-      setSubmitting(false);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/feed/home`,
+        {
+          posts
+        }
+      );
+    }
+    catch {
+      
     }
   };
 
