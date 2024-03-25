@@ -14,12 +14,12 @@ function Landing() {
       <h1>Recall</h1>
 
       <Link to="/login">
-        <button class="button" id="login">
+        <button className="button" id="login">
           Log In
         </button>
       </Link>
       <Link to="/register">
-        <button class="button" id="regisster">
+        <button className="button" id="regisster">
           Register
         </button>
       </Link>
