@@ -20,14 +20,17 @@ function Home() {
   };
 
   const handleLogout = async (e) => {
-    e.preventDefalt();
+    e.preventDefault();
 
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/logout`
       );
-    } catch (error) {
-      console.error("Failed to post:", error);
+      console.log("Logout Successful",response.data);
+      navigate("/login");
+    }
+    catch (error) {
+      console.error("Failed to logout:", error);
     }
   };
 
@@ -79,7 +82,7 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <button onClick={handleLogout} className="button" id="logout">
+      <button onClick={handleLogout} class = 'button' id = 'logout'>
         Logout
       </button>
 
