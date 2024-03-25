@@ -12,7 +12,6 @@ function Login() {
     event.preventDefault();
     console.log("logging in...");
     try {
-      // Using Axios for the POST request
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/login`,
         {
@@ -22,18 +21,20 @@ function Login() {
         { withCredentials: true }
       );
 
-      // On successful login
       console.log("Login successful", response.data);
-      navigate("/home"); // Redirect to the home page
+      navigate("/home");
     } catch (error) {
-      // Handle login errors
-      if (error.response) {
-        console.error("Login failed", error.response.data);
+      let errorMessage = "Login error: An unexpected error occurred.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
       } else if (error.request) {
-        console.error("Login failed", error.request);
+        errorMessage = "Login error: No response from server.";
       } else {
-        console.error("Login error:", error.message);
+        errorMessage = error.message;
       }
+
+      console.error(errorMessage);
+      alert(errorMessage);
     }
   };
 

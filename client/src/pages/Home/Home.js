@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [postContent, setPostContent] = useState("");
-  const [posts, setPosts] = useState([]); // Holds the list of posts
+  const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -59,16 +59,12 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <button class="button" id="login">
-        Logout
-      </button>
-      <h1>Private Page</h1>
       <div className="post-form">
         <form onSubmit={handleSubmit}>
           <textarea
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
-            placeholder="What's on your mind?"
+            placeholder="Post Something!!!"
             required
           ></textarea>
           <button type="submit" disabled={submitting}>
@@ -79,11 +75,7 @@ function Home() {
       <div className="post-list">
         {posts.map((post, index) => (
           <div key={index} className="post">
-            <p>
-              {post.username}: {post.content}
-            </p>{" "}
-            {/* Display username along with the content */}
-            {/* Display other post details here if necessary */}
+            <p>{post.username}: {post.content}</p>
           </div>
         ))}
       </div>
