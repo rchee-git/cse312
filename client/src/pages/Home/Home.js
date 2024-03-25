@@ -67,6 +67,22 @@ function Home() {
     setSubmitting(false);
   };
 
+  const handleLike = async (index) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/feed/like`,
+        {},
+        { withCredentials: true }
+      );
+
+      const updatedPosts = [...posts];
+      updatedPosts[index] = { ...updatedPosts[index], ...response.data };
+      setPosts(updatedPosts);
+    } catch (error) {
+      console.error("Failed to like post:", error);
+    }
+  };
+
   return (
     <div>
       <h1>Recall</h1>
@@ -89,6 +105,12 @@ function Home() {
             <p>
               {post.username}: {post.content}
             </p>
+            <button
+              onClick={() => handleLike(post._id, index)}
+              disabled={post.isLiked}
+            >
+              Like ({post.likes || 0})
+            </button>
           </div>
         ))}
       </div>
