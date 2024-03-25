@@ -8,7 +8,9 @@ function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/feed/home`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/feed/home`
+      );
       setPosts(response.data);
     };
 
@@ -20,15 +22,15 @@ function Home() {
     setSubmitting(true);
 
     try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/feed/home`,
-        { content: postContent },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }  // Assuming the token is stored in localStorage
-      );
+      await axios.post(`${process.env.REACT_APP_API_URL}/feed/home`, {
+        content: postContent,
+      });
 
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/feed/home`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/feed/home`
+      );
       setPosts(response.data);
-      setPostContent("");  
+      setPostContent("");
     } catch (error) {
       console.error("Failed to post:", error);
     }
@@ -55,7 +57,9 @@ function Home() {
       <div className="post-list">
         {posts.map((post, index) => (
           <div key={index} className="post">
-            <p>{post.username}: {post.content}</p>
+            <p>
+              {post.username}: {post.content}
+            </p>
           </div>
         ))}
       </div>
