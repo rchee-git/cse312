@@ -93,7 +93,7 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <button onClick={handleLogout} class="button" id="logout">
+      <button onClick={handleLogout} className="button" id="logout">
         Logout
       </button>
 
