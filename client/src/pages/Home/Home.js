@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [postContent, setPostContent] = useState("");
   const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -15,6 +17,27 @@ function Home() {
     };
 
     fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/auth/checkAuth`,
+          {},
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.data == "bad") {
+          navigate("/");
+        }
+      } catch (error) {
+        console.log("Error: ", error);
+      }
+    };
+    checkAuth();
   }, []);
 
   const handleSubmit = async (e) => {
