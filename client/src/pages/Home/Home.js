@@ -19,41 +19,17 @@ function Home() {
     fetchPosts();
   }, []);
 
-<<<<<<< HEAD
   const handleLogout = async (e) => {
     e.preventDefalt();
 
-    try{
+    try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/logout`
       );
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Failed to post:", error);
     }
   };
-=======
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/auth/checkAuth`,
-          {},
-          {
-            withCredentials: true,
-          }
-        );
-
-        if (response.data == "bad") {
-          navigate("/");
-        }
-      } catch (error) {
-        console.log("Error: ", error);
-      }
-    };
-    checkAuth();
-  }, []);
->>>>>>> 14911a050e30192b96524a2f2554afa7b315e66e
 
   useEffect(() => {
     const x = async () => {
@@ -96,6 +72,8 @@ function Home() {
     setSubmitting(false);
   };
 
+  // like button
+
   const handleLike = async (index) => {
     try {
       const response = await axios.post(
@@ -115,10 +93,10 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <button onClick={handleLogout} class = 'button' id = 'logout'>
+      <button onClick={handleLogout} class="button" id="logout">
         Logout
       </button>
-      
+
       <div className="post-form">
         <form onSubmit={handleSubmit}>
           <textarea
