@@ -1,48 +1,50 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./Home.css";
 
 function Home() {
   const [postContent, setPostContent] = useState("");
-  const [posts, setPosts] = useState([]); // Holds the list of posts
+  const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/feed/home`);
+      setPosts(response.data);
+    };
+
+    fetchPosts();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
-      // Add the new post to the beginning of the posts array immediately
-      setPosts([{ username: "guest", content: postContent }, ...posts]);
-
-      // Clear the input after submission
-      setPostContent("");
-      const response = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/feed/home`,
-        {
-          posts
-        }
+        { content: postContent },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }  // Assuming the token is stored in localStorage
       );
+
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/feed/home`);
+      setPosts(response.data);
+      setPostContent("");  
+    } catch (error) {
+      console.error("Failed to post:", error);
     }
-    catch {
-      
-    }
+
+    setSubmitting(false);
   };
 
   return (
     <div>
       <h1>Recall</h1>
-      <button class="button" id="login">
-        Logout
-      </button>
-      <h1>Private Page</h1>
       <div className="post-form">
         <form onSubmit={handleSubmit}>
           <textarea
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
-            placeholder="What's on your mind?"
+            placeholder="Post Something!!!"
             required
           ></textarea>
           <button type="submit" disabled={submitting}>
@@ -53,11 +55,7 @@ function Home() {
       <div className="post-list">
         {posts.map((post, index) => (
           <div key={index} className="post">
-            <p>
-              {post.username}: {post.content}
-            </p>{" "}
-            {/* Display username along with the content */}
-            {/* Display other post details here if necessary */}
+            <p>{post.username}: {post.content}</p>
           </div>
         ))}
       </div>
