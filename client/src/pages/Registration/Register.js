@@ -9,7 +9,6 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -18,7 +17,7 @@ function Register() {
         {
           username,
           password,
-          confirmPassword
+          confirmPassword,
         },
         {
           headers: {
@@ -28,14 +27,20 @@ function Register() {
       );
 
       if (response.status === 201) {
-        console.log("Success:", response.data);
+        console.log("Success:", response.data.message);
         alert("Registration successful");
         navigate("/");
-      } else {
-        console.error("Error:", response.statusText);
       }
     } catch (error) {
-      console.error("Error:", error);
+      if (error.response && error.response.data && error.response.data.error) {
+        // If the response has a data object with an error field, alert it
+        alert("Error: " + error.response.data.error);
+        console.error("Error:", error.response.data.error);
+      } else {
+        // If the response doesn't have an error field or isn't structured as expected, fall back to a general error message
+        alert("An error occurred during registration.");
+        console.error("Error:", error);
+      }
     }
   };
 
