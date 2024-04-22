@@ -13,10 +13,25 @@ function Home() {
 
   useEffect(() => {
     socket.current = io(process.env.REACT_APP_API_URL);
+
     socket.current.on("get_post", (newPost) => {
-      console.log(newPost)
       setPosts((currentPosts) => [...currentPosts, newPost]);
     });
+
+    // Fetch previous posts after establishing the connection
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/feed/home`,
+          { withCredentials: true }
+        );
+        setPosts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+      }
+    };
+
+    fetchPosts();
 
     return () => {
       socket.current.disconnect();
