@@ -12,22 +12,10 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  useEffect(() => {
     socket.current = io(process.env.EXPO_PUBLIC_API_URL);
-    socket.current.emit("send_post", {});
 
     socket.current.on("get_post", (data) => console.log(data));
   }, []);
-
-  const fetchPosts = async () => {
-    const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/feed/home`
-    );
-    setPosts(response.data);
-  };
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -44,34 +32,11 @@ function Home() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/feed/home`,
-        {
-          content: postContent,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/feed/home`
-      );
-      setPosts(response.data);
-      setPostContent("");
-    } catch (error) {
-      console.error("Failed to post:", error);
-    }
-
-    setSubmitting(false);
+    socket.current = io(process.env.EXPO_PUBLIC_API_URL);
+    socket.current.emit("send_post", {});
   };
 
   // like button
-
   const handleLike = async (post, index) => {
     try {
       const response = await axios.post(
@@ -81,7 +46,6 @@ function Home() {
         },
         { withCredentials: true }
       );
-      fetchPosts();
       console.log(response);
     } catch (error) {
       console.error("Failed to like post:", error);

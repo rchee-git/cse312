@@ -13,7 +13,7 @@
 ### Frontend installation (first terminal)
 - ```cd client```
 - ```npm install && npm start```
-- Is accessible through localhost:80
+- Is accessible through localhost:3000q234
 - IMPORTANT: YOU HAVE TO ```docker compose up --build``` AFTER EVERY CHANGE
 
 ### Backend installation (second terminal)
@@ -24,4 +24,4 @@
 
 ### Test examples
 - username: ```test1```
-- password: ```QJLFKX12323W123q```
+- password: ```QJLFKX12323W123q@```

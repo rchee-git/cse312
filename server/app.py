@@ -5,13 +5,21 @@ from src.auth.register import register_api
 from src.auth.login import login_api
 from src.feed.home import posts_api
 
+from src.sockets import socketio
+
 app = Flask(__name__)
+CORS(app)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Register the blueprints
 app.register_blueprint(register_api)
 app.register_blueprint(login_api)
 app.register_blueprint(posts_api)
+
+# import sockets
+socketio.init_app(app)
+
+import src.sockets.post as post
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=9000)
