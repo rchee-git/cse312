@@ -6,20 +6,17 @@ from src.service.db import users_collection, posts_collection
 from src.sockets import socketio
 
 
-@socketio.on("send_message")
+@socketio.on("send_post")
 def send_message(data):
-    print("TESTING")
-    print(data, flush=True)
-    # Ensure sender_data is provided
-    sender_data = data.get("sender_data")
+    content_data = data.get("post", flush=True)
 
-    print(sender_data, flush=True)
+    print(content_data, flush=True)
 
     # Insert the sender_data into the database
-    post_id = posts_collection.insert_one(sender_data)
-
-    # Retrieve the inserted post for broadcasting, assuming it contains message data
+    post_id = posts_collection.insert_one(content_data)
+    
     serialized_message = posts_collection.find_one({"_id": post_id})
 
+    print(serialized_message, flush=True)
     # Emit the message to the receiver's room for real-time messaging
     emit("get_post", serialized_message)

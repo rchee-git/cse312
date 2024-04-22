@@ -13,9 +13,19 @@ function Home() {
 
   useEffect(() => {
     socket.current = io(process.env.REACT_APP_API_URL);
-
     socket.current.on("get_post", (data) => console.log(data));
+
+    return () => {
+      socket.current.disconnect();
+    };
   }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    socket.current.emit("send_post", {
+      content: postContent,
+    });
+  };
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -29,14 +39,6 @@ function Home() {
     } catch (error) {
       console.error("Failed to logout:", error);
     }
-  };
-
-  const handleSubmit = async (e) => {
-    console.log("TESTING");
-    console.log(postContent);
-    socket.current.emit("send_post", {
-      content: postContent,
-    });
   };
 
   // like button

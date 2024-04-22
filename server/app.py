@@ -22,4 +22,4 @@ socketio.init_app(app)
 import src.sockets.post as post
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=9000)
+    socketio.run(app, port=3000, debug=True)
