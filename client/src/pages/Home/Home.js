@@ -12,7 +12,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.current = io(process.env.EXPO_PUBLIC_API_URL);
+    socket.current = io(process.env.REACT_APP_API_URL);
 
     socket.current.on("get_post", (data) => console.log(data));
   }, []);
@@ -32,8 +32,11 @@ function Home() {
   };
 
   const handleSubmit = async (e) => {
-    socket.current = io(process.env.EXPO_PUBLIC_API_URL);
-    socket.current.emit("send_post", {});
+    console.log("TESTING");
+    console.log(postContent);
+    socket.current.emit("send_post", {
+      content: postContent,
+    });
   };
 
   // like button

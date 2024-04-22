@@ -8,6 +8,8 @@ from src.sockets import socketio
 
 @socketio.on("send_message")
 def send_message(data):
+    print("TESTING")
+    print(data, flush=True)
     # Ensure sender_data is provided
     sender_data = data.get("sender_data")
 
