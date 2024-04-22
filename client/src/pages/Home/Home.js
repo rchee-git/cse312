@@ -1,16 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Image from "../../assets/post.png";
+import io from "socket.io-client";
 
 function Home() {
   const [postContent, setPostContent] = useState("");
   const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const socket = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    socket.current = io(process.env.EXPO_PUBLIC_API_URL);
+    socket.current.emit("send_post", {});
+
+    socket.current.on("get_post", (data) => console.log(data));
   }, []);
 
   const fetchPosts = async () => {
