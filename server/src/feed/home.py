@@ -8,6 +8,7 @@ posts_api = Blueprint("posts_api", __name__)
 @posts_api.route("/feed/home", methods=["POST"])
 def create_post():
     post_content = request.json.get("content")
+    image_data = request.json.get("imageData")
 
     auth_token = request.cookies.get("auth_token")
     hashed_token = sha256(auth_token.encode()).hexdigest()
@@ -23,6 +24,7 @@ def create_post():
             "content": post_content,
             "username": username,
             "post_like_list": [],
+            "imageData": image_data,
         }
     ).inserted_id
 
@@ -30,7 +32,8 @@ def create_post():
         "message": "Post created successfully",
         "post_id": str(post_id),
         "username": username,
-        "content": post_content
+        "content": post_content,
+        "imageData": image_data,
     }), 201
 
 @posts_api.route("/feed/home", methods=["GET"])
@@ -43,7 +46,8 @@ def get_posts():
             "content": post["content"],
             "username": post.get("username"),
             "_id": str(post['_id']),
-            "post_like_list": post["post_like_list"]
+            "post_like_list": post["post_like_list"],
+            "imageData": post.get("imageData", ""),
         })
 
     return jsonify(posts_list), 200
