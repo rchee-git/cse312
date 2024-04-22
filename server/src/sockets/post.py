@@ -29,5 +29,4 @@ def send_message(data):
         # Convert ObjectId to string
         content["_id"] = str(content["_id"])
 
-    print(content, flush=True)
     emit("get_post", content, broadcast=True)

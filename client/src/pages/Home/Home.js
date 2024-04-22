@@ -18,7 +18,6 @@ function Home() {
       setPosts((currentPosts) => [...currentPosts, newPost]);
     });
 
-    // Fetch previous posts after establishing the connection
     const fetchPosts = async () => {
       try {
         const response = await axios.get(
@@ -50,7 +49,6 @@ function Home() {
         { withCredentials: true }
       );
 
-      console.log(response.data);
       username = response.data.username;
       auth_token = response.data.auth_token;
     } catch (error) {
@@ -71,7 +69,6 @@ function Home() {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/logout`
       );
-      console.log("Logout Successful", response.data);
       navigate("/login");
     } catch (error) {
       console.error("Failed to logout:", error);
@@ -119,7 +116,11 @@ function Home() {
           </button>
         </form>
       </div>
-      <div className="post-list">
+
+      <div
+        className="post-list"
+        style={{ maxHeight: "500px", overflowY: "scroll" }}
+      >
         {posts.map((post, index) => (
           <div key={index} className="post">
             <p>
