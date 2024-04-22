@@ -9,13 +9,16 @@ from src.sockets import socketio
 @socketio.on("send_post")
 def send_message(data):
     content_data = data.get("content")
+    username = data.get("username")
+    auth_token = data.get("auth_token")
+
     post_id = posts_collection.insert_one(
         {
             "content": content_data,
-            "username": 1,
+            "username": username,
             "post_like_list": [],
         }
     )
-    
+
     serialized_message = posts_collection.find_one({"_id": post_id})
     emit("get_post", serialized_message)

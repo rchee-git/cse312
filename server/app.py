@@ -4,6 +4,7 @@ from flask_cors import CORS
 from src.auth.register import register_api
 from src.auth.login import login_api
 from src.feed.home import posts_api
+from src.auth.getToken import getToken_api
 
 from src.sockets import socketio
 
@@ -15,6 +16,7 @@ CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 app.register_blueprint(register_api)
 app.register_blueprint(login_api)
 app.register_blueprint(posts_api)
+app.register_blueprint(getToken_api)
 
 # import sockets
 socketio.init_app(app)

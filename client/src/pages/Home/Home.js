@@ -13,7 +13,10 @@ function Home() {
 
   useEffect(() => {
     socket.current = io(process.env.REACT_APP_API_URL);
-    socket.current.on("get_post", (data) => console.log(data));
+    socket.current.on("get_post", (newPost) => {
+      console.log(newPost)
+      setPosts((currentPosts) => [...currentPosts, newPost]);
+    });
 
     return () => {
       socket.current.disconnect();
@@ -22,8 +25,27 @@ function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let username;
+    let auth_token;
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/get-token`,
+        {},
+        { withCredentials: true }
+      );
+
+      console.log(response.data);
+      username = response.data.username;
+      auth_token = response.data.auth_token;
+    } catch (error) {
+      console.error("Failed to logout:", error.message);
+    }
+
     socket.current.emit("send_post", {
       content: postContent,
+      auth_token: auth_token,
+      username: username,
     });
   };
 
