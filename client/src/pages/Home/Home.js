@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Image from "../../assets/post.png";
 
 function Home() {
   const [postContent, setPostContent] = useState("");
@@ -26,10 +27,9 @@ function Home() {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/logout`
       );
-      console.log("Logout Successful",response.data);
+      console.log("Logout Successful", response.data);
       navigate("/login");
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Failed to logout:", error);
     }
   };
@@ -82,7 +82,12 @@ function Home() {
   return (
     <div>
       <h1>Recall</h1>
-      <button onClick={handleLogout} class = 'button' id = 'logout'>
+      <img
+        src={Image}
+        alt="Description"
+        style={{ width: "200px", height: "auto" }}
+      />
+      <button onClick={handleLogout} class="button" id="logout">
         Logout
       </button>
 
