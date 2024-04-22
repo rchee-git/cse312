@@ -65,7 +65,7 @@ function Home() {
         alt="Description"
         style={{ width: "200px", height: "auto" }}
       />
-      <button onClick={handleLogout} class="button" id="logout">
+      <button onClick={handleLogout} className="button" id="logout">
         Logout
       </button>
 
