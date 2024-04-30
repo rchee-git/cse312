@@ -1,29 +1,64 @@
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, blue, orange);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+/* Container for the login form */
+.login-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f4f4; /* Light grey background */
 }
 
-.container {
-    text-align: center;
+/* Styling for the form itself */
+#loginForm {
+  width: 100%;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  background: white; /* White background for the form */
+  border-radius: 8px; /* Rounded corners */
 }
 
+/* Form title */
+#loginForm h2 {
+  text-align: center;
+  color: #333; /* Dark grey color for the text */
+}
+
+/* Form group styling */
+.form-group {
+  margin-bottom: 15px; /* Space between form fields */
+}
+
+/* Labels styling */
+.form-group label {
+  display: block;
+  margin-bottom: 5px; /* Small space above the input field */
+  color: #666; /* Medium grey color */
+}
+
+/* Input fields styling */
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px; /* Slightly rounded corners for the input fields */
+  box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+}
+
+/* Button styling */
 .button {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    background-color: black; /* Button background color */
-    color: white; /* Button text color */
-    transition: opacity 0.3s;
+  padding: 10px;
+  background-color: #0056b3; /* Blue background */
+  color: white; /* White text */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .button:hover {
-    opacity: 0.8; /* Button hover effect to change opacity */
+  background-color: #003d82; /* Darker blue on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #loginForm {
+    padding: 20px 10px; /* Smaller padding on smaller screens */
+  }
 }

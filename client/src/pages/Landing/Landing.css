@@ -1,29 +1,73 @@
+/* General container setup */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, blue, orange);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to right, blue, orange);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
-
 .container {
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
+/* Header styles */
+.header h1 {
+  font-size: 2.5rem;
+  color: #333;
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Hero section styles */
+.hero h2 {
+  font-size: 2rem;
+  color: #555;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+/* Styling for the image */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Button styles */
 .button {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    background-color: black; /* Button background color */
-    color: white; /* Button text color */
-    transition: opacity 0.3s;
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 1rem;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
 }
 
 .button:hover {
-    opacity: 0.8; /* Button hover effect to change opacity */
+  color: #ffae00;
+}
+
+/* Footer styles */
+.footer p {
+  text-align: center;
+  color: #aaa;
+  font-size: 0.9rem;
 }
