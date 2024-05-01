@@ -9,6 +9,7 @@ function Home() {
   const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isBig, setIsBig] = useState(false);
   const socket = useRef(null);
   const navigate = useNavigate();
 
@@ -99,17 +100,45 @@ function Home() {
   return (
     <div
       style={
-        isDarkMode ? { backgroundColor: "black" } : { backgroundColor: "white" }
+        isDarkMode
+          ? { backgroundColor: "black", width: isBig ? 800 : 400 }
+          : { backgroundColor: "white", width: isBig ? 800 : 400 }
       }
     >
       <h1 style={isDarkMode ? { color: "black" } : { color: "white" }}>
         Recall
       </h1>
       <button
+        onClick={() => setIsBig(!isBig)}
         style={
           isDarkMode
-            ? { color: "gray", backgroundColor: "black" }
-            : { color: "black", backgroundColor: "white" }
+            ? {
+                color: "gray",
+                backgroundColor: "black",
+                fontSize: isBig ? 30 : 10,
+              }
+            : {
+                color: "black",
+                backgroundColor: "white",
+                fontSize: isBig ? 30 : 10,
+              }
+        }
+      >
+        {!isBig ? <div>Make big</div> : <div>Make small</div>}
+      </button>
+      <button
+        style={
+          isDarkMode
+            ? {
+                color: "gray",
+                backgroundColor: "black",
+                fontSize: isBig ? 30 : 10,
+              }
+            : {
+                color: "black",
+                backgroundColor: "white",
+                fontSize: isBig ? 30 : 10,
+              }
         }
         onClick={() => handleDarkMode()}
       >
@@ -128,8 +157,16 @@ function Home() {
         onClick={handleLogout}
         style={
           isDarkMode
-            ? { color: "gray", backgroundColor: "black" }
-            : { color: "black", backgroundColor: "white" }
+            ? {
+                color: "gray",
+                backgroundColor: "black",
+                fontSize: isBig ? 30 : 10,
+              }
+            : {
+                color: "black",
+                backgroundColor: "white",
+                fontSize: isBig ? 30 : 10,
+              }
         }
         id="logout"
       >
@@ -153,8 +190,16 @@ function Home() {
             type="submit"
             style={
               isDarkMode
-                ? { color: "lightgray", backgroundColor: "black" }
-                : { color: "black", backgroundColor: "white" }
+                ? {
+                    color: "lightgray",
+                    backgroundColor: "black",
+                    fontSize: isBig ? 30 : 10,
+                  }
+                : {
+                    color: "black",
+                    backgroundColor: "white",
+                    fontSize: isBig ? 30 : 10,
+                  }
             }
             disabled={submitting}
           >
@@ -169,7 +214,13 @@ function Home() {
       >
         {posts.map((post, index) => (
           <div key={index} className="post">
-            <p style={isDarkMode ? { color: "white" } : { color: "black" }}>
+            <p
+              style={
+                isDarkMode
+                  ? { color: "white", fontSize: isBig ? 30 : 10 }
+                  : { color: "black", fontSize: isBig ? 30 : 10 }
+              }
+            >
               {post.username}: {post.content}
             </p>
             <button
@@ -177,8 +228,16 @@ function Home() {
               disabled={post.isLiked}
               style={
                 isDarkMode
-                  ? { color: "lightgray", backgroundColor: "black" }
-                  : { color: "black", backgroundColor: "white" }
+                  ? {
+                      color: "lightgray",
+                      backgroundColor: "black",
+                      fontSize: isBig ? 30 : 10,
+                    }
+                  : {
+                      color: "black",
+                      backgroundColor: "white",
+                      fontSize: isBig ? 30 : 10,
+                    }
               }
             >
               Like ({post.post_like_list.length || 0})
