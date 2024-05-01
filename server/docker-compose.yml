@@ -12,7 +12,7 @@ services:
       - .:/app
     depends_on:
       - mongo
-    command: gunicorn -w 4 -k gevent -b :3000 your_application_module:app
+    command: gunicorn -w 4 -k gevent -b :3000 app:app
 
   mongo:
     image: mongo:latest
