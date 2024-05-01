@@ -8,6 +8,7 @@ function Home() {
   const [postContent, setPostContent] = useState("");
   const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const socket = useRef(null);
   const navigate = useNavigate();
 
@@ -91,15 +92,47 @@ function Home() {
     }
   };
 
+  const handleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
-    <div>
-      <h1>Recall</h1>
+    <div
+      style={
+        isDarkMode ? { backgroundColor: "black" } : { backgroundColor: "white" }
+      }
+    >
+      <h1 style={isDarkMode ? { color: "black" } : { color: "white" }}>
+        Recall
+      </h1>
+      <button
+        style={
+          isDarkMode
+            ? { color: "gray", backgroundColor: "black" }
+            : { color: "black", backgroundColor: "white" }
+        }
+        onClick={() => handleDarkMode()}
+      >
+        {isDarkMode ? (
+          <div>You are in Dark Mode</div>
+        ) : (
+          <div>You are in Light Mode</div>
+        )}
+      </button>
       <img
         src={Image}
         alt="Description"
         style={{ width: "200px", height: "auto" }}
       />
-      <button onClick={handleLogout} className="button" id="logout">
+      <button
+        onClick={handleLogout}
+        style={
+          isDarkMode
+            ? { color: "gray", backgroundColor: "black" }
+            : { color: "black", backgroundColor: "white" }
+        }
+        id="logout"
+      >
         Logout
       </button>
 
@@ -108,10 +141,23 @@ function Home() {
           <textarea
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
+            style={
+              isDarkMode
+                ? { backgroundColor: "black" }
+                : { backgroundColor: "white" }
+            }
             placeholder="Post Something!!!"
             required
           ></textarea>
-          <button type="submit" disabled={submitting}>
+          <button
+            type="submit"
+            style={
+              isDarkMode
+                ? { color: "lightgray", backgroundColor: "black" }
+                : { color: "black", backgroundColor: "white" }
+            }
+            disabled={submitting}
+          >
             {submitting ? "Posting..." : "Post"}
           </button>
         </form>
@@ -123,12 +169,17 @@ function Home() {
       >
         {posts.map((post, index) => (
           <div key={index} className="post">
-            <p>
+            <p style={isDarkMode ? { color: "white" } : { color: "black" }}>
               {post.username}: {post.content}
             </p>
             <button
               onClick={() => handleLike(post, index)}
               disabled={post.isLiked}
+              style={
+                isDarkMode
+                  ? { color: "lightgray", backgroundColor: "black" }
+                  : { color: "black", backgroundColor: "white" }
+              }
             >
               Like ({post.post_like_list.length || 0})
             </button>
