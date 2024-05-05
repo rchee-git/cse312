@@ -57,15 +57,22 @@ def schedule_post(data):
     eastern = pytz.timezone("US/Eastern")
     est_time = scheduled_time.astimezone(eastern)
 
+    # print("Scheduled Time: ", est_time + timedelta(hours=4),  flush=True) 
+    # print("Now: ", datetime.now(eastern).replace(microsecond=0), flush=True)
     # Check if scheduled time is in the past
-    if est_time < datetime.now(eastern):
+    if est_time + timedelta(hours=4) < datetime.now(eastern).replace(microsecond=0):
         print(
             "Scheduled time is in the past. Adjusting to the next available time.",
             flush=True,
         )
-        est_time = datetime.now(eastern) + timedelta(
+        est_time = datetime.now(eastern).replace(microsecond=0) + timedelta(
             seconds=30
         )  # Adjust to 30 seconds in the future
+    else:
+        print(
+            "Scheduled time is in the future.",
+            flush=True,
+        )
 
     # Store the scheduled post in the database
     post_data = {
@@ -77,8 +84,9 @@ def schedule_post(data):
 
     post_id = posts_collection.insert_one(post_data).inserted_id
 
+    print("est_time: ", est_time + timedelta(hours=4), flush=True)
     # Schedule the post
-    scheduler.add_job(send_scheduled_post, "date", run_date=est_time, args=[post_id])
+    scheduler.add_job(send_scheduled_post, "date", run_date=est_time + timedelta(hours=4), args=[post_id])
 
 
 def convert_datetime_to_string(obj):

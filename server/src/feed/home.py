@@ -49,7 +49,7 @@ def get_posts():
     # Get the current time in UTC
     eastern = pytz.timezone("US/Eastern")
     # Get the current time in UTC, then convert to EST
-    current_time = datetime.now(pytz.UTC).astimezone(eastern)
+    current_time = datetime.now(eastern).replace(microsecond=0)
 
     # Query posts that have a scheduled_time less than the current time or don't have the field
     posts = posts_collection.find({"scheduled_time": {"$lt": current_time}})
@@ -103,7 +103,7 @@ def like_post():
 @posts_api.route("/feed/upcomingPosts", methods=["GET"])
 def get_upcoming_posts():
     eastern = pytz.timezone("US/Eastern")
-    current_time = datetime.now(pytz.UTC).astimezone(eastern)
+    current_time = datetime.now(eastern).replace(microsecond=0)
 
     posts = posts_collection.find({"scheduled_time": {"$gt": current_time}})
     posts_list = []
@@ -116,5 +116,8 @@ def get_upcoming_posts():
             "imageData": post.get("imageData", ""),
             "scheduled_time": post["scheduled_time"].isoformat(),
         }
+        print("posts times: ", post["scheduled_time"], post["scheduled_time"].isoformat())
         posts_list.append(post_data)
+    print("current_time: ", current_time)
+
     return jsonify(posts_list), 200
