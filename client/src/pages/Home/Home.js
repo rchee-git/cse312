@@ -23,6 +23,7 @@ function Home() {
     socket.current = io(process.env.REACT_APP_API_URL);
 
     socket.current.on("get_post", (newPost) => {
+      console.log("Received post:", newPost);
       setPosts((currentPosts) => [...currentPosts, newPost]);
     });
 
@@ -45,7 +46,7 @@ function Home() {
     };
   }, []);
 
-  // handle new messages
+  // handle new messages for sending NOW
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -68,6 +69,35 @@ function Home() {
       content: postContent,
       auth_token: auth_token,
       username: username,
+    });
+  };
+
+  // handle new messages for sending NOW
+  const handleScheduleSend = async (e) => {
+    e.preventDefault();
+
+    let username;
+    let auth_token;
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/get-token`,
+        {},
+        { withCredentials: true }
+      );
+
+      username = response.data.username;
+      auth_token = response.data.auth_token;
+    } catch (error) {
+      console.error("Failed to logout:", error.message);
+    }
+
+    console.log(scheduledTime);
+
+    socket.current.emit("schedule_send_post", {
+      content: postContent,
+      auth_token: auth_token,
+      username: username,
+      scheduledTime,
     });
   };
 
@@ -204,6 +234,7 @@ function Home() {
         ></textarea>
 
         <button
+          onClick={handleSubmit}
           type="submit"
           style={
             isDarkMode
@@ -225,6 +256,7 @@ function Home() {
 
         <br></br>
 
+        {/* schedule send */}
         <input
           type="datetime-local"
           value={scheduledTime}
@@ -238,6 +270,7 @@ function Home() {
         />
 
         <button
+          onClick={handleScheduleSend}
           type="submit"
           style={
             isDarkMode
