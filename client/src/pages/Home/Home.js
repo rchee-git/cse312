@@ -14,6 +14,7 @@ function Home() {
   const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [textColor, setTextColor] = useState("#000000");
+  const [upcomingPosts, setUpcomingPosts] = useState([]);
 
   // Themes
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -26,6 +27,9 @@ function Home() {
     socket.current.on("get_post", (newPost) => {
       console.log("Received post:", newPost);
       setPosts((currentPosts) => [...currentPosts, newPost]);
+      setUpcomingPosts((prevPosts) =>
+        prevPosts.filter((post) => post._id !== newPost._id)
+      );
     });
 
     const fetchPosts = async () => {
@@ -45,6 +49,21 @@ function Home() {
     return () => {
       socket.current.disconnect();
     };
+  }, []);
+
+  const fetchUpcomingPosts = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/feed/upcomingPosts`,
+        { withCredentials: true }
+      );
+      setUpcomingPosts(response.data);
+    } catch (error) {
+      console.error("Failed to fetch upcoming posts:", error);
+    }
+  };
+  useEffect(() => {
+    fetchUpcomingPosts();
   }, []);
 
   // handle new messages for sending NOW
@@ -85,11 +104,11 @@ function Home() {
         {},
         { withCredentials: true }
       );
-
       username = response.data.username;
       auth_token = response.data.auth_token;
     } catch (error) {
-      console.error("Failed to logout:", error.message);
+      console.error("Failed to get auth token:", error.message);
+      return;
     }
 
     console.log(scheduledTime);
@@ -100,6 +119,16 @@ function Home() {
       username: username,
       scheduledTime,
     });
+
+    // Add to upcoming posts list
+    const newPost = {
+      content: postContent,
+      username: username,
+      post_like_list: [],
+      scheduled_time: scheduledTime,
+      _id: Math.random().toString(36).substr(2, 9), // Temporary unique ID
+    };
+    setUpcomingPosts((prevPosts) => [...prevPosts, newPost]);
   };
 
   // logging out
@@ -137,212 +166,160 @@ function Home() {
   };
 
   return (
-    <div
-      style={
-        isDarkMode
-          ? {
-              backgroundColor: "black",
-              color: textColor,
-              width: isBig ? 800 : 400,
-            }
-          : {
-              backgroundColor: "white",
-              color: textColor,
-              width: isBig ? 800 : 400,
-            }
-      }
-    >
-      {/* top header */}
-      <h1
-        style={
-          isDarkMode
-            ? { color: "white", color: textColor }
-            : { color: "black", color: textColor }
-        }
-      >
-        Recall
-      </h1>
-      <input
-        type="color"
-        value={textColor}
-        onChange={(e) => setTextColor(e.target.value)}
-      />
-      <button
-        onClick={() => setIsBig(!isBig)}
-        style={
-          isDarkMode
-            ? {
-                color: textColor,
-                backgroundColor: "black",
-                fontSize: isBig ? 30 : 10,
-              }
-            : {
-                color: textColor,
-
-                backgroundColor: "white",
-                fontSize: isBig ? 30 : 10,
-              }
-        }
-      >
-        {!isBig ? <div>Make big</div> : <div>Make small</div>}
-      </button>
-      <button
-        style={
-          isDarkMode
-            ? {
-                color: textColor,
-
-                backgroundColor: "black",
-                fontSize: isBig ? 30 : 10,
-              }
-            : {
-                color: textColor,
-
-                backgroundColor: "white",
-                fontSize: isBig ? 30 : 10,
-              }
-        }
-        onClick={() => handleDarkMode()}
-      >
-        {isDarkMode ? (
-          <div>You are in Dark Mode</div>
-        ) : (
-          <div>You are in Light Mode</div>
-        )}
-      </button>
-
-      <br></br>
-
-      {/* recall logo */}
-      <img
-        src={Image}
-        alt="Description"
-        style={{ width: "200px", height: "auto" }}
-      />
-
-      <br></br>
-
-      <button
-        onClick={handleLogout}
-        style={
-          isDarkMode
-            ? {
-                color: textColor,
-
-                backgroundColor: "black",
-                fontSize: isBig ? 30 : 10,
-              }
-            : {
-                color: textColor,
-
-                backgroundColor: "white",
-                fontSize: isBig ? 30 : 10,
-              }
-        }
-        id="logout"
-      >
-        Logout
-      </button>
-
-      {/* form submit */}
-      <div className="post-form">
-        <textarea
-          value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
-          style={
-            isDarkMode
-              ? { backgroundColor: "black", color: textColor }
-              : { backgroundColor: "white", color: textColor }
-          }
-          placeholder="Post Something!!!"
-          required
-        ></textarea>
-
-        <button
-          onClick={handleSubmit}
-          type="submit"
+    <>
+      <div style={{ display: "flex" }}>
+        <div
           style={
             isDarkMode
               ? {
-                  color: textColor,
                   backgroundColor: "black",
-                  fontSize: isBig ? 30 : 10,
+                  color: textColor,
+                  width: isBig ? 800 : 400,
+                  flex: 1,
                 }
               : {
-                  color: textColor,
                   backgroundColor: "white",
-                  fontSize: isBig ? 30 : 10,
+                  color: textColor,
+                  width: isBig ? 800 : 400,
+                  flex: 1,
                 }
           }
-          disabled={submitting}
         >
-          {submitting ? "Posting..." : "Post Now"}
-        </button>
+          {/* top header */}
+          <h1
+            style={
+              isDarkMode
+                ? { color: "white", color: textColor }
+                : { color: "black", color: textColor }
+            }
+          >
+            Recall
+          </h1>
 
-        <br></br>
+          <button
+            onClick={handleLogout}
+            style={
+              isDarkMode
+                ? {
+                    color: textColor,
 
-        {/* schedule send */}
-        <input
-          type="datetime-local"
-          value={scheduledTime}
-          onChange={(e) => setScheduledTime(e.target.value)}
-          style={
-            isDarkMode
-              ? {
-                  backgroundColor: "black",
-                  color: textColor,
-                }
-              : { backgroundColor: "white", color: textColor }
-          }
-          required
-        />
+                    backgroundColor: "black",
+                    fontSize: isBig ? 30 : 10,
+                    borderRadius: "8px",
+                    padding: isBig ? "10px 20px" : "6px 12px",
+                    border: "none",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    cursor: "pointer",
+                    transition: "background 0.3s, box-shadow 0.3s",
+                    outline: "none",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    fontWeight: "bold",
+                  }
+                : {
+                    color: textColor,
 
-        <button
-          onClick={handleScheduleSend}
-          type="submit"
-          style={
-            isDarkMode
-              ? {
-                  color: textColor,
-                  backgroundColor: "black",
-                  fontSize: isBig ? 30 : 10,
-                }
-              : {
-                  color: textColor,
-                  backgroundColor: "white",
-                  fontSize: isBig ? 30 : 10,
-                }
-          }
-          disabled={submitting}
-        >
-          {submitting ? "Posting..." : "Schedule Post"}
-        </button>
-      </div>
+                    backgroundColor: "white",
+                    fontSize: isBig ? 30 : 10,
+                    borderRadius: "8px",
+                    padding: isBig ? "10px 20px" : "6px 12px",
+                    border: "none",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    cursor: "pointer",
+                    transition: "background 0.3s, box-shadow 0.3s",
+                    outline: "none",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    fontWeight: "bold",
+                  }
+            }
+            id="logout"
+          >
+            Logout
+          </button>
 
-      <div
-        className="post-list"
-        style={{ maxHeight: "500px", overflowY: "scroll" }}
-      >
-        {posts.map((post, index) => (
-          <div key={index} className="post">
-            <p
+          <br></br>
+          <br></br>
+
+          <input
+            type="color"
+            value={textColor}
+            onChange={(e) => setTextColor(e.target.value)}
+          />
+
+          <button
+            onClick={() => setIsBig(!isBig)}
+            style={
+              isDarkMode
+                ? {
+                    color: textColor,
+                    backgroundColor: "black",
+                    fontSize: isBig ? 30 : 10,
+                  }
+                : {
+                    color: textColor,
+
+                    backgroundColor: "white",
+                    fontSize: isBig ? 30 : 10,
+                  }
+            }
+          >
+            {!isBig ? <div>Make big</div> : <div>Make small</div>}
+          </button>
+
+          <button
+            style={
+              isDarkMode
+                ? {
+                    color: textColor,
+
+                    backgroundColor: "black",
+                    fontSize: isBig ? 30 : 10,
+                  }
+                : {
+                    color: textColor,
+
+                    backgroundColor: "white",
+                    fontSize: isBig ? 30 : 10,
+                  }
+            }
+            onClick={() => handleDarkMode()}
+          >
+            {isDarkMode ? (
+              <div>You are in Dark Mode</div>
+            ) : (
+              <div>You are in Light Mode</div>
+            )}
+          </button>
+
+          <br></br>
+
+          {/* recall logo */}
+          <img
+            src={Image}
+            alt="Description"
+            style={{ width: "200px", height: "auto" }}
+          />
+
+          <br></br>
+
+          {/* form submit */}
+          <div className="post-form">
+            <textarea
+              value={postContent}
+              onChange={(e) => setPostContent(e.target.value)}
               style={
                 isDarkMode
-                  ? {
-                      color: textColor,
-                      fontSize: isBig ? 30 : 10,
-                    }
-                  : {
-                      color: textColor,
-                      fontSize: isBig ? 30 : 10,
-                    }
+                  ? { backgroundColor: "black", color: textColor }
+                  : { backgroundColor: "white", color: textColor }
               }
-            >
-              {post.username}: {post.content}
-            </p>
+              placeholder="Post Something!!!"
+              required
+            ></textarea>
+
             <button
-              onClick={() => handleLike(post, index)}
-              disabled={post.isLiked}
+              onClick={handleSubmit}
+              type="submit"
               style={
                 isDarkMode
                   ? {
@@ -356,13 +333,152 @@ function Home() {
                       fontSize: isBig ? 30 : 10,
                     }
               }
+              disabled={submitting}
             >
-              Like ({post.post_like_list.length || 0})
+              {submitting ? "Posting..." : "Post Now"}
+            </button>
+
+            <br></br>
+
+            {/* schedule send */}
+            <input
+              type="datetime-local"
+              value={scheduledTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
+              style={
+                isDarkMode
+                  ? {
+                      backgroundColor: "black",
+                      color: textColor,
+                    }
+                  : { backgroundColor: "white", color: textColor }
+              }
+              required
+            />
+
+            <button
+              onClick={handleScheduleSend}
+              type="submit"
+              style={
+                isDarkMode
+                  ? {
+                      color: textColor,
+                      backgroundColor: "black",
+                      fontSize: isBig ? 30 : 10,
+                    }
+                  : {
+                      color: textColor,
+                      backgroundColor: "white",
+                      fontSize: isBig ? 30 : 10,
+                    }
+              }
+              disabled={submitting}
+            >
+              {submitting ? "Posting..." : "Schedule Post"}
             </button>
           </div>
-        ))}
+
+          <div
+            className="post-list"
+            style={{ maxHeight: "500px", overflowY: "scroll" }}
+          >
+            {posts.map((post, index) => (
+              <div
+                key={index}
+                className="post"
+                style={{
+                  backgroundColor: "#ffffff",
+                  margin: "10px",
+                  padding: "20px",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                }}
+              >
+                <p
+                  style={
+                    isDarkMode
+                      ? {
+                          color: textColor,
+                          fontSize: isBig ? 30 : 10,
+                        }
+                      : {
+                          color: textColor,
+                          fontSize: isBig ? 30 : 10,
+                        }
+                  }
+                >
+                  {post.username}: {post.content}
+                </p>
+                <button
+                  onClick={() => handleLike(post, index)}
+                  disabled={post.isLiked}
+                  style={
+                    isDarkMode
+                      ? {
+                          color: textColor,
+                          backgroundColor: "black",
+                          fontSize: isBig ? 30 : 10,
+                        }
+                      : {
+                          color: textColor,
+                          backgroundColor: "white",
+                          fontSize: isBig ? 30 : 10,
+                        }
+                  }
+                >
+                  Like ({post.post_like_list.length || 0})
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+          }}
+        >
+          <h1
+            style={{
+              textAlign: "center",
+              margin: "20px 0",
+              color: "#333",
+              fontSize: "24px",
+            }}
+          >
+            Upcoming Scheduled Posts
+          </h1>
+          {upcomingPosts.length === 0 ? (
+            <p style={{ textAlign: "center", color: "#888" }}>
+              No upcoming posts
+            </p>
+          ) : (
+            upcomingPosts.map((post, index) => (
+              <div
+                key={index}
+                className="post"
+                style={{
+                  backgroundColor: "#ffffff",
+                  margin: "10px",
+                  padding: "20px",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                }}
+              >
+                <p style={{ margin: "0 0 10px", color: "#888" }}>
+                  Posting at {new Date(post.scheduled_time).toLocaleString()}
+                </p>
+                <p style={{ margin: "0", color: "#333", fontWeight: "bold" }}>
+                  {post.username}: {post.content}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

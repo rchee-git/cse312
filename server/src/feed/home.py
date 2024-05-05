@@ -47,7 +47,7 @@ def create_post():
 @posts_api.route("/feed/home", methods=["GET"])
 def get_posts():
     # Get the current time in UTC
-    eastern = pytz.timezone('US/Eastern')
+    eastern = pytz.timezone("US/Eastern")
     # Get the current time in UTC, then convert to EST
     current_time = datetime.now(pytz.UTC).astimezone(eastern)
 
@@ -98,3 +98,23 @@ def like_post():
         {"_id": ObjectId(post_id)}, {"$set": {"post_like_list": post_like_list}}
     )
     return "good" + str(post_like_list)
+
+
+@posts_api.route("/feed/upcomingPosts", methods=["GET"])
+def get_upcoming_posts():
+    eastern = pytz.timezone("US/Eastern")
+    current_time = datetime.now(pytz.UTC).astimezone(eastern)
+
+    posts = posts_collection.find({"scheduled_time": {"$gt": current_time}})
+    posts_list = []
+    for post in posts:
+        post_data = {
+            "content": post["content"],
+            "username": post.get("username"),
+            "_id": str(post["_id"]),
+            "post_like_list": post["post_like_list"],
+            "imageData": post.get("imageData", ""),
+            "scheduled_time": post["scheduled_time"].isoformat(),
+        }
+        posts_list.append(post_data)
+    return jsonify(posts_list), 200
