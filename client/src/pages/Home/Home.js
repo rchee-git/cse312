@@ -13,6 +13,7 @@ function Home() {
   const [scheduledTime, setScheduledTime] = useState("");
   const [posts, setPosts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [textColor, setTextColor] = useState("#000000");
 
   // Themes
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -139,25 +140,45 @@ function Home() {
     <div
       style={
         isDarkMode
-          ? { backgroundColor: "black", width: isBig ? 800 : 400 }
-          : { backgroundColor: "white", width: isBig ? 800 : 400 }
+          ? {
+              backgroundColor: "black",
+              color: textColor,
+              width: isBig ? 800 : 400,
+            }
+          : {
+              backgroundColor: "white",
+              color: textColor,
+              width: isBig ? 800 : 400,
+            }
       }
     >
       {/* top header */}
-      <h1 style={isDarkMode ? { color: "black" } : { color: "white" }}>
+      <h1
+        style={
+          isDarkMode
+            ? { color: "white", color: textColor }
+            : { color: "black", color: textColor }
+        }
+      >
         Recall
       </h1>
+      <input
+        type="color"
+        value={textColor}
+        onChange={(e) => setTextColor(e.target.value)}
+      />
       <button
         onClick={() => setIsBig(!isBig)}
         style={
           isDarkMode
             ? {
-                color: "gray",
+                color: textColor,
                 backgroundColor: "black",
                 fontSize: isBig ? 30 : 10,
               }
             : {
-                color: "black",
+                color: textColor,
+
                 backgroundColor: "white",
                 fontSize: isBig ? 30 : 10,
               }
@@ -169,12 +190,14 @@ function Home() {
         style={
           isDarkMode
             ? {
-                color: "gray",
+                color: textColor,
+
                 backgroundColor: "black",
                 fontSize: isBig ? 30 : 10,
               }
             : {
-                color: "black",
+                color: textColor,
+
                 backgroundColor: "white",
                 fontSize: isBig ? 30 : 10,
               }
@@ -204,12 +227,14 @@ function Home() {
         style={
           isDarkMode
             ? {
-                color: "gray",
+                color: textColor,
+
                 backgroundColor: "black",
                 fontSize: isBig ? 30 : 10,
               }
             : {
-                color: "black",
+                color: textColor,
+
                 backgroundColor: "white",
                 fontSize: isBig ? 30 : 10,
               }
@@ -226,8 +251,8 @@ function Home() {
           onChange={(e) => setPostContent(e.target.value)}
           style={
             isDarkMode
-              ? { backgroundColor: "black" }
-              : { backgroundColor: "white" }
+              ? { backgroundColor: "black", color: textColor }
+              : { backgroundColor: "white", color: textColor }
           }
           placeholder="Post Something!!!"
           required
@@ -239,12 +264,12 @@ function Home() {
           style={
             isDarkMode
               ? {
-                  color: "lightgray",
+                  color: textColor,
                   backgroundColor: "black",
                   fontSize: isBig ? 30 : 10,
                 }
               : {
-                  color: "black",
+                  color: textColor,
                   backgroundColor: "white",
                   fontSize: isBig ? 30 : 10,
                 }
@@ -263,8 +288,11 @@ function Home() {
           onChange={(e) => setScheduledTime(e.target.value)}
           style={
             isDarkMode
-              ? { backgroundColor: "black", color: "white" }
-              : { backgroundColor: "white", color: "black" }
+              ? {
+                  backgroundColor: "black",
+                  color: textColor,
+                }
+              : { backgroundColor: "white", color: textColor }
           }
           required
         />
@@ -275,12 +303,12 @@ function Home() {
           style={
             isDarkMode
               ? {
-                  color: "lightgray",
+                  color: textColor,
                   backgroundColor: "black",
                   fontSize: isBig ? 30 : 10,
                 }
               : {
-                  color: "black",
+                  color: textColor,
                   backgroundColor: "white",
                   fontSize: isBig ? 30 : 10,
                 }
@@ -300,8 +328,14 @@ function Home() {
             <p
               style={
                 isDarkMode
-                  ? { color: "white", fontSize: isBig ? 30 : 10 }
-                  : { color: "black", fontSize: isBig ? 30 : 10 }
+                  ? {
+                      color: textColor,
+                      fontSize: isBig ? 30 : 10,
+                    }
+                  : {
+                      color: textColor,
+                      fontSize: isBig ? 30 : 10,
+                    }
               }
             >
               {post.username}: {post.content}
@@ -312,12 +346,12 @@ function Home() {
               style={
                 isDarkMode
                   ? {
-                      color: "lightgray",
+                      color: textColor,
                       backgroundColor: "black",
                       fontSize: isBig ? 30 : 10,
                     }
                   : {
-                      color: "black",
+                      color: textColor,
                       backgroundColor: "white",
                       fontSize: isBig ? 30 : 10,
                     }
