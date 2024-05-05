@@ -5,14 +5,20 @@ import Image from "../../assets/post.png";
 import io from "socket.io-client";
 
 function Home() {
-  const [postContent, setPostContent] = useState("");
-  const [posts, setPosts] = useState([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isBig, setIsBig] = useState(false);
   const socket = useRef(null);
   const navigate = useNavigate();
 
+  // posting
+  const [postContent, setPostContent] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
+  const [posts, setPosts] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Themes
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isBig, setIsBig] = useState(false);
+
+  // fetching posts
   useEffect(() => {
     socket.current = io(process.env.REACT_APP_API_URL);
 
@@ -39,6 +45,7 @@ function Home() {
     };
   }, []);
 
+  // handle new messages
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,6 +71,7 @@ function Home() {
     });
   };
 
+  // logging out
   const handleLogout = async (e) => {
     e.preventDefault();
 
@@ -105,6 +113,7 @@ function Home() {
           : { backgroundColor: "white", width: isBig ? 800 : 400 }
       }
     >
+      {/* top header */}
       <h1 style={isDarkMode ? { color: "black" } : { color: "white" }}>
         Recall
       </h1>
@@ -148,11 +157,18 @@ function Home() {
           <div>You are in Light Mode</div>
         )}
       </button>
+
+      <br></br>
+
+      {/* recall logo */}
       <img
         src={Image}
         alt="Description"
         style={{ width: "200px", height: "auto" }}
       />
+
+      <br></br>
+
       <button
         onClick={handleLogout}
         style={
@@ -173,39 +189,73 @@ function Home() {
         Logout
       </button>
 
+      {/* form submit */}
       <div className="post-form">
-        <form onSubmit={handleSubmit}>
-          <textarea
-            value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
-            style={
-              isDarkMode
-                ? { backgroundColor: "black" }
-                : { backgroundColor: "white" }
-            }
-            placeholder="Post Something!!!"
-            required
-          ></textarea>
-          <button
-            type="submit"
-            style={
-              isDarkMode
-                ? {
-                    color: "lightgray",
-                    backgroundColor: "black",
-                    fontSize: isBig ? 30 : 10,
-                  }
-                : {
-                    color: "black",
-                    backgroundColor: "white",
-                    fontSize: isBig ? 30 : 10,
-                  }
-            }
-            disabled={submitting}
-          >
-            {submitting ? "Posting..." : "Post"}
-          </button>
-        </form>
+        <textarea
+          value={postContent}
+          onChange={(e) => setPostContent(e.target.value)}
+          style={
+            isDarkMode
+              ? { backgroundColor: "black" }
+              : { backgroundColor: "white" }
+          }
+          placeholder="Post Something!!!"
+          required
+        ></textarea>
+
+        <button
+          type="submit"
+          style={
+            isDarkMode
+              ? {
+                  color: "lightgray",
+                  backgroundColor: "black",
+                  fontSize: isBig ? 30 : 10,
+                }
+              : {
+                  color: "black",
+                  backgroundColor: "white",
+                  fontSize: isBig ? 30 : 10,
+                }
+          }
+          disabled={submitting}
+        >
+          {submitting ? "Posting..." : "Post Now"}
+        </button>
+
+        <br></br>
+
+        <input
+          type="datetime-local"
+          value={scheduledTime}
+          onChange={(e) => setScheduledTime(e.target.value)}
+          style={
+            isDarkMode
+              ? { backgroundColor: "black", color: "white" }
+              : { backgroundColor: "white", color: "black" }
+          }
+          required
+        />
+
+        <button
+          type="submit"
+          style={
+            isDarkMode
+              ? {
+                  color: "lightgray",
+                  backgroundColor: "black",
+                  fontSize: isBig ? 30 : 10,
+                }
+              : {
+                  color: "black",
+                  backgroundColor: "white",
+                  fontSize: isBig ? 30 : 10,
+                }
+          }
+          disabled={submitting}
+        >
+          {submitting ? "Posting..." : "Schedule Post"}
+        </button>
       </div>
 
       <div
