@@ -4,6 +4,7 @@ from flask_socketio import emit, join_room
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 from flask import current_app
+from app import app
 
 from src.service.db import users_collection, posts_collection
 from src.sockets import socketio
@@ -80,10 +81,18 @@ def schedule_post(data):
     scheduler.add_job(send_scheduled_post, "date", run_date=est_time, args=[post_id])
 
 
+def convert_datetime_to_string(obj):
+    for key, value in obj.items():
+        if isinstance(value, datetime):
+            obj[key] = value.isoformat()
+    return obj
+
 def send_scheduled_post(post_id):
-    with current_app.app_context():
+    with app.app_context():
         post = posts_collection.find_one({"_id": ObjectId(post_id)})
         if post:
             post["_id"] = str(post["_id"])
+            post = convert_datetime_to_string(post)
+
             print(f"Emitting scheduled post: {post}", flush=True)
             emit("get_post", post, broadcast=True, namespace="/")
