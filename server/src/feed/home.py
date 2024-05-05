@@ -47,7 +47,9 @@ def create_post():
 @posts_api.route("/feed/home", methods=["GET"])
 def get_posts():
     # Get the current time in UTC
-    current_time = datetime.now(pytz.UTC)
+    eastern = pytz.timezone('US/Eastern')
+    # Get the current time in UTC, then convert to EST
+    current_time = datetime.now(pytz.UTC).astimezone(eastern)
 
     # Query posts that have a scheduled_time less than the current time or don't have the field
     posts = posts_collection.find({"scheduled_time": {"$lt": current_time}})
