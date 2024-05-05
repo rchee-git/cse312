@@ -2,8 +2,11 @@ from flask import Blueprint, request, jsonify
 from src.service.db import posts_collection, users_collection
 from hashlib import sha256
 from bson import ObjectId
+from datetime import datetime
+import pytz
 
 posts_api = Blueprint("posts_api", __name__)
+
 
 @posts_api.route("/feed/home", methods=["POST"])
 def create_post():
@@ -13,11 +16,10 @@ def create_post():
     auth_token = request.cookies.get("auth_token")
     hashed_token = sha256(auth_token.encode()).hexdigest()
     user = users_collection.find_one({"auth_token": hashed_token})
-    username = user['username']
-    
+    username = user["username"]
+
     if not post_content:
         return jsonify({"error": "Post content is required"}), 400
-
 
     post_id = posts_collection.insert_one(
         {
@@ -28,29 +30,45 @@ def create_post():
         }
     ).inserted_id
 
-    return jsonify({
-        "message": "Post created successfully",
-        "post_id": str(post_id),
-        "username": username,
-        "content": post_content,
-        "imageData": image_data,
-    }), 201
+    return (
+        jsonify(
+            {
+                "message": "Post created successfully",
+                "post_id": str(post_id),
+                "username": username,
+                "content": post_content,
+                "imageData": image_data,
+            }
+        ),
+        201,
+    )
+
 
 @posts_api.route("/feed/home", methods=["GET"])
 def get_posts():
-    posts = posts_collection.find()
+    # Get the current time in UTC
+    current_time = datetime.now(pytz.UTC)
+
+    # Query posts that have a scheduled_time less than the current time or don't have the field
+    posts = posts_collection.find({"scheduled_time": {"$lt": current_time}})
 
     posts_list = []
     for post in posts:
-        posts_list.append({
+        post_data = {
             "content": post["content"],
             "username": post.get("username"),
-            "_id": str(post['_id']),
+            "_id": str(post["_id"]),
             "post_like_list": post["post_like_list"],
             "imageData": post.get("imageData", ""),
-        })
+        }
+        # Add scheduled_time if it exists
+        if "scheduled_time" in post:
+            post_data["scheduled_time"] = post["scheduled_time"].isoformat()
+
+        posts_list.append(post_data)
 
     return jsonify(posts_list), 200
+
 
 @posts_api.route("/feed/like", methods=["POST"])
 def like_post():
@@ -62,11 +80,11 @@ def like_post():
     auth_token = request.cookies.get("auth_token")
     hashed_token = sha256(auth_token.encode()).hexdigest()
     user = users_collection.find_one({"auth_token": hashed_token})
-    username = user['username']
+    username = user["username"]
 
     # find post in database using post_id
     post_data = posts_collection.find_one({"_id": ObjectId(post_id)})
-    post_like_list = post_data['post_like_list']
+    post_like_list = post_data["post_like_list"]
 
     if username in post_like_list:
         post_like_list.remove(username)
@@ -76,5 +94,5 @@ def like_post():
     # update database with new post_like_list
     posts_collection.update_one(
         {"_id": ObjectId(post_id)}, {"$set": {"post_like_list": post_like_list}}
-        )
-    return 'good' + str(post_like_list)
+    )
+    return "good" + str(post_like_list)
