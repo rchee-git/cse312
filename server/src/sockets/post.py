@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 from bson import ObjectId
 from flask_socketio import emit, join_room
-from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 from flask import current_app
 from app import app
+import time
 
 from src.service.db import users_collection, posts_collection
 from src.sockets import socketio
@@ -22,6 +22,7 @@ def send_message(data):
         "username": username,
         "post_like_list": [],
         "imageData": image_data,  # Store base64 string directly
+        "delay": -0.5,
     }
 
     post_id = posts_collection.insert_one(post_data).inserted_id
@@ -34,59 +35,40 @@ def send_message(data):
     emit("get_post", content, broadcast=True)
 
 
-# Initialize the scheduler
-scheduler = BackgroundScheduler(job_defaults={"misfire_grace_time": 60})
-scheduler.start()
-
 
 @socketio.on("schedule_send_post")
 def schedule_post(data):
     content_data = data.get("content")
     username = data.get("username")
     auth_token = data.get("auth_token")
-    scheduled_time = data.get("scheduledTime")
+    delay_in_seconds = int(data.get("scheduledTime"))
 
-    # Add ':00' if the time doesn't include seconds
-    if len(scheduled_time.split("T")[-1]) == 5:
-        scheduled_time += ":00"
-
-    # Convert scheduled time to a datetime object and then to EST
-    scheduled_time = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M:%S").replace(
-        tzinfo=pytz.UTC
-    )
-    eastern = pytz.timezone("US/Eastern")
-    est_time = scheduled_time.astimezone(eastern)
-
-    # print("Scheduled Time: ", est_time + timedelta(hours=4),  flush=True) 
-    # print("Now: ", datetime.now(eastern).replace(microsecond=0), flush=True)
-    # Check if scheduled time is in the past
-    if est_time + timedelta(hours=4) < datetime.now(eastern).replace(microsecond=0):
-        print(
-            "Scheduled time is in the past. Adjusting to the next available time.",
-            flush=True,
-        )
-        est_time = datetime.now(eastern).replace(microsecond=0) + timedelta(
-            seconds=30
-        )  # Adjust to 30 seconds in the future
-    else:
-        print(
-            "Scheduled time is in the future.",
-            flush=True,
-        )
-
-    # Store the scheduled post in the database
+    time_to_post = datetime.now().replace(microsecond=0) + timedelta(seconds=delay_in_seconds)
+    time_now = datetime.now().replace(microsecond=0)
     post_data = {
         "content": content_data,
         "username": username,
         "post_like_list": [],
-        "scheduled_time": est_time,
+        "delay": delay_in_seconds,
     }
+    posts_collection.insert_one(post_data)
+    id = post_data.pop('_id')
+    post_data['_id'] = str(id)
+    while time_to_post > time_now:
+        post_data['delay'] = post_data['delay'] - 0.5
+        delay_in_seconds -= 0.5
+        emit("get_upcoming_post", post_data, broadcast=True, namespace="/")
+        posts_collection.update_one(
+            {"_id": id},
+            {"$set": {"delay": delay_in_seconds}}
+        )
+        time_now = datetime.now().replace(microsecond=0)
+        time.sleep(0.5)
+        print("waiting for post", flush=True)
 
-    post_id = posts_collection.insert_one(post_data).inserted_id
 
-    print("est_time: ", est_time + timedelta(hours=4), flush=True)
-    # Schedule the post
-    scheduler.add_job(send_scheduled_post, "date", run_date=est_time + timedelta(hours=4), args=[post_id])
+    print("end", flush=True)
+    emit("get_post", post_data, broadcast=True, namespace="/")
 
 
 def convert_datetime_to_string(obj):
@@ -95,12 +77,3 @@ def convert_datetime_to_string(obj):
             obj[key] = value.isoformat()
     return obj
 
-def send_scheduled_post(post_id):
-    with app.app_context():
-        post = posts_collection.find_one({"_id": ObjectId(post_id)})
-        if post:
-            post["_id"] = str(post["_id"])
-            post = convert_datetime_to_string(post)
-
-            print(f"Emitting scheduled post: {post}", flush=True)
-            emit("get_post", post, broadcast=True, namespace="/")

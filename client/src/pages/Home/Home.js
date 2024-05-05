@@ -12,7 +12,6 @@ function Home() {
   const [postContent, setPostContent] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [posts, setPosts] = useState([]);
-  const [submitting, setSubmitting] = useState(false);
   const [textColor, setTextColor] = useState("#000000");
   const [upcomingPosts, setUpcomingPosts] = useState([]);
 
@@ -25,11 +24,12 @@ function Home() {
     socket.current = io(process.env.REACT_APP_API_URL);
 
     socket.current.on("get_post", (newPost) => {
-      console.log("Received post:", newPost);
       setPosts((currentPosts) => [...currentPosts, newPost]);
-      setUpcomingPosts((prevPosts) =>
-        prevPosts.filter((post) => post._id !== newPost._id)
-      );
+    });
+    socket.current.on("get_upcoming_post", (newPost) => {
+      console.log("Testing1: ", upcomingPosts);
+      console.log("Testing2: ", newPost);
+      setUpcomingPosts((currentPosts) => [...currentPosts, newPost]);
     });
 
     const fetchPosts = async () => {
@@ -128,7 +128,6 @@ function Home() {
       scheduled_time: scheduledTime,
       _id: Math.random().toString(36).substr(2, 9), // Temporary unique ID
     };
-    setUpcomingPosts((prevPosts) => [...prevPosts, newPost]);
   };
 
   // logging out
@@ -333,16 +332,19 @@ function Home() {
                       fontSize: isBig ? 30 : 10,
                     }
               }
-              disabled={submitting}
             >
-              {submitting ? "Posting..." : "Post Now"}
+              {false ? "Posting..." : "Post Now"}
             </button>
 
             <br></br>
 
             {/* schedule send */}
             <input
-              type="datetime-local"
+              type="number"
+              name="numberInput"
+              min="0"
+              max="1000"
+              required
               value={scheduledTime}
               onChange={(e) => setScheduledTime(e.target.value)}
               style={
@@ -353,7 +355,6 @@ function Home() {
                     }
                   : { backgroundColor: "white", color: textColor }
               }
-              required
             />
 
             <button
@@ -372,9 +373,8 @@ function Home() {
                       fontSize: isBig ? 30 : 10,
                     }
               }
-              disabled={submitting}
             >
-              {submitting ? "Posting..." : "Schedule Post"}
+              {false ? "Posting..." : "Post with Delay in Seconds"}
             </button>
           </div>
 
@@ -454,27 +454,29 @@ function Home() {
               No upcoming posts
             </p>
           ) : (
-            upcomingPosts.map((post, index) => (
-              <div
-                key={index}
-                className="post"
-                style={{
-                  backgroundColor: "#ffffff",
-                  margin: "10px",
-                  padding: "20px",
-                  borderRadius: "8px",
-                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                  transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                }}
-              >
-                <p style={{ margin: "0 0 10px", color: "#888" }}>
-                  Posting at {new Date(post.scheduled_time).toLocaleString()}
-                </p>
-                <p style={{ margin: "0", color: "#333", fontWeight: "bold" }}>
-                  {post.username}: {post.content}
-                </p>
-              </div>
-            ))
+            upcomingPosts.map((post, index) => {
+              return (
+                <div
+                  key={index}
+                  className="post"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    margin: "10px",
+                    padding: "20px",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                  }}
+                >
+                  <p style={{ margin: "0 0 10px", color: "#888" }}>
+                    It will be posted in {post.delay} seconds
+                  </p>
+                  <p style={{ margin: "0", color: "#333", fontWeight: "bold" }}>
+                    {post.username}: {post.content}
+                  </p>
+                </div>
+              );
+            })
           )}
         </div>
       </div>

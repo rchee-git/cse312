@@ -4,6 +4,7 @@ from hashlib import sha256
 from bson import ObjectId
 from datetime import datetime
 import pytz
+import time
 
 posts_api = Blueprint("posts_api", __name__)
 
@@ -46,14 +47,7 @@ def create_post():
 
 @posts_api.route("/feed/home", methods=["GET"])
 def get_posts():
-    # Get the current time in UTC
-    eastern = pytz.timezone("US/Eastern")
-    # Get the current time in UTC, then convert to EST
-    current_time = datetime.now(eastern).replace(microsecond=0)
-
-    # Query posts that have a scheduled_time less than the current time or don't have the field
-    posts = posts_collection.find({"scheduled_time": {"$lt": current_time}})
-
+    posts = posts_collection.find({"delay": {"$lte": 0}})
     posts_list = []
     for post in posts:
         post_data = {
@@ -65,7 +59,7 @@ def get_posts():
         }
         # Add scheduled_time if it exists
         if "scheduled_time" in post:
-            post_data["scheduled_time"] = post["scheduled_time"].isoformat()
+            post_data["scheduled_time"] = post["scheduled_time"]
 
         posts_list.append(post_data)
 
@@ -102,10 +96,7 @@ def like_post():
 
 @posts_api.route("/feed/upcomingPosts", methods=["GET"])
 def get_upcoming_posts():
-    eastern = pytz.timezone("US/Eastern")
-    current_time = datetime.now(eastern).replace(microsecond=0)
-
-    posts = posts_collection.find({"scheduled_time": {"$gt": current_time}})
+    posts = posts_collection.find({"delay": {"$gt": 0}})
     posts_list = []
     for post in posts:
         post_data = {
@@ -114,10 +105,8 @@ def get_upcoming_posts():
             "_id": str(post["_id"]),
             "post_like_list": post["post_like_list"],
             "imageData": post.get("imageData", ""),
-            "scheduled_time": post["scheduled_time"].isoformat(),
+            "delay": post["delay"],
         }
-        print("posts times: ", post["scheduled_time"], post["scheduled_time"].isoformat())
         posts_list.append(post_data)
-    print("current_time: ", current_time)
 
     return jsonify(posts_list), 200
