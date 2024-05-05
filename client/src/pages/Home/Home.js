@@ -27,9 +27,10 @@ function Home() {
       setPosts((currentPosts) => [...currentPosts, newPost]);
     });
     socket.current.on("get_upcoming_post", (newPost) => {
-      console.log("Testing1: ", upcomingPosts);
-      console.log("Testing2: ", newPost);
-      setUpcomingPosts((currentPosts) => [...currentPosts, newPost]);
+      if (newPost.delay > 0) {
+        // CHANGE HERE, filter out with same id or something
+        setUpcomingPosts((currentPosts) => [...currentPosts, newPost]);
+      }
     });
 
     const fetchPosts = async () => {
