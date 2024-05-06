@@ -1,5 +1,25 @@
 # CSE312 Group Project
 
+### Ao3 Project 3 feature
+
+Change all text color feature
+
+#### Procedure
+
+in the page left of the make big button there is a color button
+click on the color button and ensure that all text on the screen except the image post changes to the color you select
+
+#### tests
+
+Tests
+-check that the button text color is changed to ones selected
+-check that each chat post text color is changed to one selected
+-check that schedule post text color is changed when clicked on the calendar colors should remain defaulted
+-check that the schedule post button text color change to one selected
+-check that each logout button text is changed to one selected
+-check that each like button text color is changed to one selected
+-check that each chat post text color is changed to one selected
+
 ## For graders
 
 ### installation instructions
@@ -32,27 +52,3 @@
 
 - username: `test1`
 - password: `QJLFKX12323W123q@`
-
-### Domain Name
-
-# recall312.me
-
-### Ao3 Project 3 feature
-
-Change all text color feature
-
-#### Procedure
-
-in the page left of the make big button there is a color button
-click on the color button and ensure that all text on the screen except the image post changes to the color you select
-
-#### tests
-
-Tests
--check that the button text color is changed to ones selected
--check that each chat post text color is changed to one selected
--check that schedule post text color is changed when clicked on the calendar colors should remain defaulted
--check that the schedule post button text color change to one selected
--check that each logout button text is changed to one selected
--check that each like button text color is changed to one selected
--check that each chat post text color is changed to one selected

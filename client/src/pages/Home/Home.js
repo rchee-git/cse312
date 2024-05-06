@@ -118,35 +118,43 @@ function Home() {
   const handleScheduleSend = async (e) => {
     e.preventDefault();
 
-    if (parseInt(scheduledTime) < 2){
-      alert("input a higher time than 2!")
-    }
-
-
-    let username;
-    let auth_token;
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/auth/get-token`,
-        {},
-        { withCredentials: true }
-      );
-      username = response.data.username;
-      auth_token = response.data.auth_token;
+      // Check for valid scheduled time
+      if (!scheduledTime || parseInt(scheduledTime) < 2) {
+        alert("please input a higher time than 2")
+        throw new Error("Please input a higher time than 2!");
+      }
+
+      let username;
+      let auth_token;
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/auth/get-token`,
+          {},
+          { withCredentials: true }
+        );
+        username = response.data.username;
+        auth_token = response.data.auth_token;
+      } catch (error) {
+        console.error("Failed to get auth token:", error.message);
+        return;
+      }
+
+      setIsSendDelay(true);
+
+      socket.current.emit("schedule_send_post", {
+        content: postContent,
+        auth_token: auth_token,
+        username: username,
+        UniqueIDToCheck: Math.random().toString(36).substr(2, 9),
+        scheduledTime,
+      });
     } catch (error) {
-      console.error("Failed to get auth token:", error.message);
-      return;
+      // Handle the error and provide feedback to the user
+      console.error("Error:", error.message);
+      // Optional: Show the error to the user via a UI element or alert
+      alert(error.message);
     }
-
-    setIsSendDelay(true);
-
-    socket.current.emit("schedule_send_post", {
-      content: postContent,
-      auth_token: auth_token,
-      username: username,
-      UniqueIDToCheck: Math.random().toString(36).substr(2, 9),
-      scheduledTime,
-    });
   };
 
   // logging out
@@ -380,9 +388,7 @@ function Home() {
               </>
             ) : (
               <>
-                <h3>
-                  There is a scheduled post already, please wait
-                </h3>
+                <h3>There is a scheduled post already, please wait</h3>
               </>
             )}
           </div>
