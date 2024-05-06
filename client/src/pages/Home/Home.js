@@ -15,22 +15,43 @@ function Home() {
   const [textColor, setTextColor] = useState("#000000");
   const [upcomingPosts, setUpcomingPosts] = useState([]);
 
+  // Enable or disable the delay input
+  const [isSendDelay, setIsSendDelay] = useState(false);
+
   // Themes
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isBig, setIsBig] = useState(false);
 
   // fetching posts
+  // In your Home component's useEffect
   useEffect(() => {
     socket.current = io(process.env.REACT_APP_API_URL);
 
     socket.current.on("get_post", (newPost) => {
       setPosts((currentPosts) => [...currentPosts, newPost]);
     });
+
     socket.current.on("get_upcoming_post", (newPost) => {
       if (newPost.delay > 0) {
-        // CHANGE HERE, filter out with same id or something
+        setUpcomingPosts((prevPosts) =>
+          prevPosts.filter(
+            (post) => post.UniqueIDToCheck !== newPost.UniqueIDToCheck
+          )
+        );
         setUpcomingPosts((currentPosts) => [...currentPosts, newPost]);
+      } else if (newPost.delay == 0) {
+        setUpcomingPosts((prevPosts) =>
+          prevPosts.filter(
+            (post) => post.UniqueIDToCheck !== newPost.UniqueIDToCheck
+          )
+        );
+        setIsSendDelay(false);
       }
+    });
+
+    // Listen for the disable_send_delay event to disable the delay input
+    socket.current.on("disable_send_delay", () => {
+      setIsSendDelay(true);
     });
 
     const fetchPosts = async () => {
@@ -97,6 +118,11 @@ function Home() {
   const handleScheduleSend = async (e) => {
     e.preventDefault();
 
+    if (parseInt(scheduledTime) < 2){
+      alert("input a higher time than 2!")
+    }
+
+
     let username;
     let auth_token;
     try {
@@ -112,23 +138,15 @@ function Home() {
       return;
     }
 
-    console.log(scheduledTime);
+    setIsSendDelay(true);
 
     socket.current.emit("schedule_send_post", {
       content: postContent,
       auth_token: auth_token,
       username: username,
+      UniqueIDToCheck: Math.random().toString(36).substr(2, 9),
       scheduledTime,
     });
-
-    // Add to upcoming posts list
-    const newPost = {
-      content: postContent,
-      username: username,
-      post_like_list: [],
-      scheduled_time: scheduledTime,
-      _id: Math.random().toString(36).substr(2, 9), // Temporary unique ID
-    };
   };
 
   // logging out
@@ -205,32 +223,12 @@ function Home() {
 
                     backgroundColor: "black",
                     fontSize: isBig ? 30 : 10,
-                    borderRadius: "8px",
-                    padding: isBig ? "10px 20px" : "6px 12px",
-                    border: "none",
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                    cursor: "pointer",
-                    transition: "background 0.3s, box-shadow 0.3s",
-                    outline: "none",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    fontWeight: "bold",
                   }
                 : {
                     color: textColor,
 
                     backgroundColor: "white",
                     fontSize: isBig ? 30 : 10,
-                    borderRadius: "8px",
-                    padding: isBig ? "10px 20px" : "6px 12px",
-                    border: "none",
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                    cursor: "pointer",
-                    transition: "background 0.3s, box-shadow 0.3s",
-                    outline: "none",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    fontWeight: "bold",
                   }
             }
             id="logout"
@@ -339,44 +337,54 @@ function Home() {
 
             <br></br>
 
-            {/* schedule send */}
-            <input
-              type="number"
-              name="numberInput"
-              min="0"
-              max="1000"
-              required
-              value={scheduledTime}
-              onChange={(e) => setScheduledTime(e.target.value)}
-              style={
-                isDarkMode
-                  ? {
-                      backgroundColor: "black",
-                      color: textColor,
-                    }
-                  : { backgroundColor: "white", color: textColor }
-              }
-            />
+            {isSendDelay == false ? (
+              <>
+                {/* schedule send */}
+                <input
+                  type="number"
+                  name="numberInput"
+                  min="0"
+                  max="1000"
+                  required
+                  value={scheduledTime}
+                  onChange={(e) => setScheduledTime(e.target.value)}
+                  style={
+                    isDarkMode
+                      ? {
+                          backgroundColor: "black",
+                          color: textColor,
+                        }
+                      : { backgroundColor: "white", color: textColor }
+                  }
+                />
 
-            <button
-              onClick={handleScheduleSend}
-              type="submit"
-              style={
-                isDarkMode
-                  ? {
-                      color: textColor,
-                      backgroundColor: "black",
-                      fontSize: isBig ? 30 : 10,
-                    }
-                  : {
-                      color: textColor,
-                      backgroundColor: "white",
-                      fontSize: isBig ? 30 : 10,
-                    }
-              }
-            >
-              {false ? "Posting..." : "Post with Delay in Seconds"}
-            </button>
+                <button
+                  onClick={handleScheduleSend}
+                  type="submit"
+                  style={
+                    isDarkMode
+                      ? {
+                          color: textColor,
+                          backgroundColor: "black",
+                          fontSize: isBig ? 30 : 10,
+                        }
+                      : {
+                          color: textColor,
+                          backgroundColor: "white",
+                          fontSize: isBig ? 30 : 10,
+                        }
+                  }
+                >
+                  {false ? "Posting..." : "Post with Delay in Seconds"}
+                </button>
+              </>
+            ) : (
+              <>
+                <h3>
+                  There is a scheduled post already, please wait
+                </h3>
+              </>
+            )}
           </div>
 
           <div
@@ -458,23 +466,49 @@ function Home() {
             upcomingPosts.map((post, index) => {
               return (
                 <div
-                  key={index}
-                  className="post"
                   style={{
-                    backgroundColor: "#ffffff",
-                    margin: "10px",
-                    padding: "20px",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                    flex: 1,
                   }}
                 >
-                  <p style={{ margin: "0 0 10px", color: "#888" }}>
-                    It will be posted in {post.delay} seconds
-                  </p>
-                  <p style={{ margin: "0", color: "#333", fontWeight: "bold" }}>
-                    {post.username}: {post.content}
-                  </p>
+                  {upcomingPosts.filter((post) => post.delay > 0).length ===
+                  0 ? (
+                    <p style={{ textAlign: "center", color: "#888" }}>
+                      No upcoming posts
+                    </p>
+                  ) : (
+                    upcomingPosts
+                      .filter((post) => post.delay > 0)
+                      .map((post, index) => {
+                        return (
+                          <div
+                            key={index}
+                            className="post"
+                            style={{
+                              backgroundColor: "#ffffff",
+                              margin: "10px",
+                              padding: "20px",
+                              borderRadius: "8px",
+                              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                              transition:
+                                "transform 0.2s ease, box-shadow 0.2s ease",
+                            }}
+                          >
+                            <p style={{ margin: "0 0 10px", color: "#888" }}>
+                              It will be posted in {post.delay} seconds
+                            </p>
+                            <p
+                              style={{
+                                margin: "0",
+                                color: "#333",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {post.username}: {post.content}
+                            </p>
+                          </div>
+                        );
+                      })
+                  )}
                 </div>
               );
             })

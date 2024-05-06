@@ -42,6 +42,7 @@ def schedule_post(data):
     username = data.get("username")
     auth_token = data.get("auth_token")
     delay_in_seconds = int(data.get("scheduledTime"))
+    UniqueIDToCheck = data.get("UniqueIDToCheck")
 
     time_to_post = datetime.now().replace(microsecond=0) + timedelta(seconds=delay_in_seconds)
     time_now = datetime.now().replace(microsecond=0)
@@ -50,13 +51,20 @@ def schedule_post(data):
         "username": username,
         "post_like_list": [],
         "delay": delay_in_seconds,
+        "UniqueIDToCheck": UniqueIDToCheck
     }
+
     posts_collection.insert_one(post_data)
     id = post_data.pop('_id')
     post_data['_id'] = str(id)
+
+    # Emit the disable_send_delay event to all connected clients
+    emit("disable_send_delay", broadcast=True, namespace="/")
+
     while time_to_post > time_now:
         post_data['delay'] = post_data['delay'] - 0.5
         delay_in_seconds -= 0.5
+
         emit("get_upcoming_post", post_data, broadcast=True, namespace="/")
         posts_collection.update_one(
             {"_id": id},
